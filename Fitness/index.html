@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shushtaka Fitness - Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex flex-col items-center p-6">
+
+    
+    <div id="exerciseModal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div id="modalData">
+                <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl mb-6" id="modalIcon">💪</div>
+                <h3 id="modalTitle" class="text-2xl font-black text-slate-900 mb-2"></h3>
+                <p id="modalReps" class="text-blue-600 font-bold text-sm uppercase mb-6"></p>
+                <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 mb-8">
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">შესრულების წესი</p>
+                    <p id="modalDesc" class="text-slate-600 text-sm leading-relaxed"></p>
+                </div>
+                <button onclick="closeModal()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-all">გავიგე</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        
+        <div class="text-center lg:text-left space-y-6">
+            <h1 class="text-5xl lg:text-7xl font-black text-slate-900 leading-tight">
+                შექმენი შენი <span class="text-blue-600">იდეალური</span> სხეული.
+            </h1>
+            <p class="text-xl text-slate-600 max-w-lg">
+              მიიღე შენზე მორგებული ვარჯიშის გეგმა, რომელიც ყველგან მუშაობს.
+            არ აქვს მნიშვნელობა, სახლში ხარ თუ დარბაზში — ჩვენი დეტალური ინსტრუქციებით
+              შენ ყოველთვის გეცოდინება, ზუსტად რა და
+              როგორ გააკეთო მაქსიმალური შედეგისთვის. </p>
+            
+            <div class="space-y-4">
+
+                <div class="flex items-center gap-4 justify-center lg:justify-start">
+                    <span class="bg-blue-100 text-blue-600 p-2 rounded-lg font-bold">✓</span>
+                    <span class="text-lg font-bold text-slate-700">ვარჯიშის გეგმა (სახლი ან დარბაზი)</span>
+                </div>
+                <div class="flex items-center gap-4 justify-center lg:justify-start">
+                    <span class="bg-blue-100 text-blue-600 p-2 rounded-lg font-bold">✓</span>
+                    <span class="text-lg font-bold text-slate-700">შედეგი მხოლოდ 30 დღეში</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-center lg:justify-end">
+            <div class="bg-white rounded-[3.5rem] shadow-2xl w-full max-w-sm min-h-[660px] flex flex-col justify-between border border-white relative overflow-hidden shrink-0">
+                
+                <div id="backBtn" onclick="prevStep()" class="back-btn p-2 bg-slate-50 rounded-full hover:bg-slate-100 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </div>
+
+                <div id="steps-container" class="p-8 flex-grow flex flex-col justify-center">
+                    
+                    <div class="step active" id="step1">
+                        <h2 class="text-3xl font-black text-slate-800 text-center mb-8 leading-tight pt-6">აირჩიე<br>სქესი</h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div onclick="setGender('male')" class="cursor-pointer card-opt p-3 rounded-[2rem] flex flex-col items-center">
+                                <div class="illustration-box">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M6 21V19C6 16.7909 7.79086 15 10 15H14C16.2091 15 18 16.7909 18 19V21" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="font-bold text-slate-700">კაცი</span>
+                            </div>
+                            <div onclick="setGender('female')" class="cursor-pointer card-opt p-3 rounded-[2rem] flex flex-col items-center">
+                                <div class="illustration-box" style="background: #fdf2f8;">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M18 21V19C18 16.7909 16.2091 15 14 15H10C7.79086 15 6 16.7909 6 19V21" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 15V21" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="font-bold text-slate-700">ქალი</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step" id="step2">
+                        <h2 class="text-2xl font-black text-slate-800 mb-6 text-center pt-6">მონაცემები</h2>
+                        <div class="unit-selector">
+                            <div id="mUnit" onclick="switchUnit('metric')" class="unit-tab active">სმ / კგ</div>
+                            <div id="iUnit" onclick="switchUnit('imperial')" class="unit-tab">FT / LB</div>
+                        </div>
+
+                        
+<div class="space-y-4">
+    <div class="bg-slate-50 p-5 rounded-3xl border border-slate-100 focus-within:border-blue-300 flex justify-between items-end">
+        <div class="flex-1">
+            <label id="heightLabel" class="text-[10px] text-slate-400 block mb-1 uppercase font-black tracking-wider">სიმაღლე (სმ)</label>
+            <input type="number" id="height" placeholder="175" class="bg-transparent w-full outline-none text-2xl font-bold text-slate-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+        </div>
+        
+        <div class="flex gap-2">
+            <button onclick="decrement('height')" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-xl hover:bg-slate-100 active:scale-90 transition-all text-slate-600 font-bold shadow-sm">-</button>
+            <button onclick="increment('height')" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-xl hover:bg-slate-100 active:scale-90 transition-all text-slate-600 font-bold shadow-sm">+</button>
+        </div>
+    </div>
+
+    <div class="bg-slate-50 p-5 rounded-3xl border border-slate-100 focus-within:border-blue-300 flex justify-between items-end">
+        <div class="flex-1">
+            <label id="weightLabel" class="text-[10px] text-slate-400 block mb-1 uppercase font-black tracking-wider">წონა (კგ)</label>
+            <input type="number" id="weight" placeholder="70" class="bg-transparent w-full outline-none text-2xl font-bold text-slate-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+        </div>
+
+        <div class="flex gap-2">
+            <button onclick="decrement('weight')" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-xl hover:bg-slate-100 active:scale-90 transition-all text-slate-600 font-bold shadow-sm">-</button>
+            <button onclick="increment('weight')" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-xl hover:bg-slate-100 active:scale-90 transition-all text-slate-600 font-bold shadow-sm">+</button>
+        </div>
+    </div>
+</div>
+                        <button onclick="calculateBMI()" class="w-full mt-10 bg-slate-900 text-white py-5 rounded-3xl font-bold shadow-xl active:scale-95 transition-transform">გამოთვლა</button>
+                    </div>
+
+                    <div id="error-msg" class="text-red-500 text-[10px] font-black uppercase text-center mt-4 hidden">
+    მონაცემები არარეალურია!
+</div>
+                    <div class="step text-center" id="step3">
+                        <h2 class="text-xs font-black text-slate-400 uppercase mb-2 tracking-widest pt-6">ანალიზი</h2>
+                        <div class="speedometer"><div class="speedometer-inner"></div><div id="needle"></div></div>
+                        <div id="bmiStatus" class="text-2xl font-black mb-1 italic">--</div>
+                        <div class="bg-blue-600 p-5 rounded-[2rem] shadow-lg mb-6 text-white mt-4">
+                            <p class="text-[9px] uppercase font-black opacity-80 mb-1">დღიური ნორმა</p>
+                            <div id="dailyCals" class="text-2xl font-black">--</div>
+                        </div>
+                        <button onclick="nextStep(4)" class="w-full bg-slate-900 text-white py-4 rounded-3xl font-bold shadow-xl">გაგრძელება</button>
+                    </div>
+
+                    <div class="step" id="step4">
+                        <h2 class="text-2xl font-black text-slate-800 mb-6 text-center pt-6">რა არის მიზანი?</h2>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div onclick="setGoal('დაკლება')" class="card-opt p-4 rounded-2xl cursor-pointer flex flex-col items-center">
+                                <span class="text-2xl mb-1">📉</span> <span class="text-[10px] font-black uppercase text-slate-600">წონის დაკლება</span>
+                            </div>
+                            <div onclick="setGoal('მომატება')" class="card-opt p-4 rounded-2xl cursor-pointer flex flex-col items-center">
+                                <span class="text-2xl mb-1">📈</span> <span class="text-[10px] font-black uppercase text-slate-600">წონის მომატება</span>
+                            </div>
+                            <div onclick="setChoice('goal', 'ძალა', 6)" class="card-opt p-4 rounded-2xl cursor-pointer flex flex-col items-center">
+                                <span class="text-2xl mb-1">💪</span> <span class="text-[10px] font-black uppercase text-slate-600">ძალა</span>
+                            </div>
+                            <div onclick="setChoice('goal', 'კარდიო', 6)" class="card-opt p-4 rounded-2xl cursor-pointer flex flex-col items-center">
+                                <span class="text-2xl mb-1">🏃‍♂️</span> <span class="text-[10px] font-black uppercase text-slate-600">კარდიო</span>
+                            </div>
+                        </div>
+                    </div>
+
+<div class="step" id="step5">
+    <h2 id="targetTitle" class="text-2xl font-black text-slate-800 mb-6 text-center pt-6">სამიზნე წონა</h2>
+    
+    <div class="space-y-4">
+        <div class="bg-slate-50 p-5 rounded-3xl border border-slate-100 focus-within:border-blue-300 flex justify-between items-end">
+            <div class="flex-1">
+                <label class="text-[10px] text-slate-400 block mb-1 uppercase font-black tracking-wider">სასურველი წონა (კგ)</label>
+                <input type="number" id="targetWeight" oninput="calculateRealTime()" placeholder="65" 
+                    class="bg-transparent w-full outline-none text-2xl font-bold text-slate-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="decrement('targetWeight')" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-xl hover:bg-slate-100 active:scale-90 transition-all text-slate-600 font-bold shadow-sm">-</button>
+                <button onclick="increment('targetWeight')" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-xl hover:bg-slate-100 active:scale-90 transition-all text-slate-600 font-bold shadow-sm">+</button>
+            </div>
+        </div>
+        
+        <div id="realTimeBox" class="bg-blue-50 p-4 rounded-2xl border border-blue-100 hidden">
+            <p class="text-[10px] text-blue-400 uppercase font-black mb-1">პროგნოზი</p>
+            <p id="suggestedTime" class="text-sm font-bold text-blue-700">--</p>
+        </div>
+    </div>
+
+    <button id="confirmTargetBtn" onclick="nextStep(6)" 
+        class="w-full mt-10 bg-slate-900 text-white py-5 rounded-[2rem] font-bold shadow-xl opacity-50 cursor-not-allowed transition-all" disabled>
+        დადასტურება
+    </button>
+</div>
+
+<div class="step" id="step6">
+    <div class="mt-6">
+    <p class="text-[10px] text-slate-400 uppercase font-black mb-3 tracking-widest text-center">ვარჯიშის ინტენსივობა</p>
+    <div class="flex bg-slate-100 p-1 rounded-2xl gap-1">
+        <button onclick="setIntens('low')" class="intens-btn flex-1 py-3 rounded-xl text-xs font-bold transition-all" id="intens-low">მსუბუქი</button>
+        <button onclick="setIntens('med')" class="intens-btn flex-1 py-3 rounded-xl text-xs font-bold bg-white shadow-sm transition-all" id="intens-med">საშუალო</button>
+        <button onclick="setIntens('high')" class="intens-btn flex-1 py-3 rounded-xl text-xs font-bold transition-all" id="intens-high">ინტენსიური</button>
+    </div>
+</div>
+    <h2 class="text-2xl font-black text-slate-800 mb-8 text-center pt-6">სად ივარჯიშებ?</h2>
+    <div class="grid grid-cols-2 gap-4">
+        <div onclick="setChoice('location', 'სახლი', 'loading')" class="card-opt p-6 rounded-[2rem] flex flex-col items-center cursor-pointer">
+            <span class="text-4xl mb-2">🏠</span>
+            <span class="font-bold text-slate-700 uppercase text-[10px]">სახლი</span>
+        </div>
+        <div onclick="setChoice('location', 'დარბაზი', 'loading')" class="card-opt p-6 rounded-[2rem] flex flex-col items-center cursor-pointer">
+            <span class="text-4xl mb-2">🏋️‍♂️</span>
+            <span class="font-bold text-slate-700 uppercase text-[10px]">დარბაზი</span>
+        </div>
+    </div>
+</div>
+<div id="step-loading" class="step items-center justify-center text-center">
+    <div class="loader-content">
+        <div class="relative w-24 h-24 mb-6 mx-auto">
+            <div class="absolute inset-0 border-4 border-blue-100 rounded-full"></div>
+            <div id="loader-progress" class="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+        </div>
+        
+        <h2 id="loading-text" class="text-xl font-black text-slate-800 mb-2">მონაცემების ანალიზი...</h2>
+        <p id="loading-subtext" class="text-slate-500 text-sm italic">ვამუშავებთ თქვენს მეტაბოლურ პროფილს</p>
+        
+        <div class="w-64 h-2 bg-slate-100 rounded-full mt-6 overflow-hidden mx-auto">
+            <div id="loading-bar" class="h-full bg-blue-500 transition-all duration-300" style="width: 0%"></div>
+        </div>
+    </div>
+</div>
+                    <div class="step -m-8" id="step7">
+                        <div class="bg-slate-900 pt-10 pb-8 px-8 rounded-b-[2.5rem] text-center shadow-xl relative">
+                            <div class="success-checkmark mb-4">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <h2 class="text-white text-2xl font-black italic">გეგმა მზად არის!</h2>
+                        </div>
+
+                        <div class="p-8 -mt-4">
+                            <div class="bg-white p-5 rounded-[2rem] shadow-lg border border-slate-50 space-y-3 mb-6">
+                                <div class="flex items-center gap-3 p-2.5 bg-slate-50 rounded-xl">
+                                    <div class="text-lg">🎯</div>
+                                    <div>
+                                        <p class="text-[9px] text-slate-400 font-bold uppercase">მიზანი</p>
+                                        <p id="resGoal" class="text-xs font-black text-slate-800"></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-2.5 bg-slate-50 rounded-xl">
+                                    <div class="text-lg">⚖️</div>
+                                    <div>
+                                        <p class="text-[9px] text-slate-400 font-bold uppercase">პროგნოზი</p>
+                                        <p id="resWeightInfo" class="text-xs font-black text-slate-800"></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-2.5 bg-slate-50 rounded-xl">
+                                    <div class="text-lg">📍</div>
+                                    <div>
+                                        <p class="text-[9px] text-slate-400 font-bold uppercase">ლოკაცია</p>
+                                        <p id="resLoc" class="text-xs font-black text-slate-800"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button onclick="showFinalWorkout()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-[1.8rem] font-black text-lg shadow-lg active:scale-95 transition-all flex items-center justify-center gap-3">
+                                <span>მიიღე გეგმა</span>
+                                <span class="bg-blue-500 px-2.5 py-0.5 rounded-full text-xs">10₾</span>
+                            </button>
+                        </div>
+                        
+                    </div>
+
+                    <div class="step -m-8" id="step8">
+                        <div class="bg-slate-900 pt-8 pb-6 px-8 rounded-b-[2rem] text-center shadow-lg">
+                            <h2 class="text-white text-xl font-black uppercase tracking-wider">პერსონალური გეგმა</h2>
+                            <p class="text-blue-400 text-[10px] font-bold mt-1" id="workoutSubTitle"></p>
+                        </div>
+                        
+                        
+                        <div class="p-6 space-y-6 overflow-y-auto max-h-[480px]" id="workout-list-container">
+                            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                            </div>
+
+                            <div id="workout-items" class="space-y-3">
+                                </div>
+                        </div>
+
+                        <div class="flex justify-between items-center mb-6 px-2">
+    <div>
+        <h3 class="text-xl font-black text-slate-800">შენი გეგმა</h3>
+        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">7 პერსონალური ვარჯიში</p>
+    </div>
+    
+    <button onclick="regenerateWorkout()" class="group flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-2xl shadow-sm hover:border-blue-300 hover:shadow-md active:scale-95 transition-all">
+        <span id="shuffle-icon" class="text-blue-600 transition-transform duration-500 group-hover:rotate-180">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+            </svg>
+        </span>
+        <span class="text-xs font-black text-slate-600 uppercase tracking-tight">შეცვლა</span>
+    </button>
+</div>
+
+                        <div class="p-6 pt-2">
+                            <button onclick="window.print()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm shadow-lg active:scale-95 transition-all">გადმოწერე PDF</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="footer-dots" class="flex justify-center gap-2 pb-8">
+                    <div onclick="goToStep(1)" class="progress-dot active"></div>
+                    <div onclick="goToStep(2)" class="progress-dot"></div>
+                    <div onclick="goToStep(3)" class="progress-dot"></div>
+                    <div onclick="goToStep(4)" class="progress-dot"></div>
+                    <div onclick="goToStep(5)" class="progress-dot"></div>
+                    <div onclick="goToStep(6)" class="progress-dot"></div>
+                    <div onclick="goToStep(7)" class="progress-dot"></div>
+                    <div onclick="goToStep(8)" class="progress-dot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none;">
+    <div id="pdf-template" style="padding: 40px; font-family: 'Inter', sans-serif; color: #1e293b;">
+        <h1 style="color: #3b82f6; text-align: center; font-size: 28px;">SHUSHTAKA FITNESS PRO</h1>
+        <p style="text-align: center; color: #64748b;">პერსონალური ვარჯიშის გეგმა</p>
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+        
+        <div id="pdf-stats" style="display: flex; justify-content: space-around; background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 25px;">
+            </div>
+
+        <div id="pdf-exercises">
+            </div>
+
+        <footer style="margin-top: 40px; text-align: center; font-size: 12px; color: #94a3b8;">
+            © 2024 Shushtaka Fitness - შენი შედეგი ჩვენი მიზანია
+        </footer>
+    </div>
+</div>
+
+<section class="value-proposition">
+    <div class="vp-container">
+        <div class="vp-header text-center">
+            <span class="vp-badge">რატომ Shushtaka Fitness?</span>
+            <h2>შედეგი, რომელიც <span>რეალურია</span></h2>
+            <p>ჩვენ არ გაძლევთ უბრალოდ სავარჯიშოების ჩამონათვალს. ჩვენ გაძლევთ ზუსტ ალგორითმს თქვენი სხეულის ტრანსფორმაციისთვის.</p>
+        </div>
+
+        <div class="vp-comparison">
+            <div class="compare-card old-way">
+                <div class="card-status">სტანდარტული მიდგომა</div>
+                <ul class="compare-list">
+                    <li>❌ ვარჯიში ყოველგვარი გეგმის გარეშე</li>
+                    <li>❌ ტრავმების რისკი არასწორი ტექნიკით</li>
+                    <li>❌ პროგრესის გაჩერება</li>
+                    <li>❌ არასაფუძვლიანი ცოდნა ფინტეს სფეროში</li>
+                    <li>❌ გაურკვევლობა: "დღეს რა გავაკეთო?" </li>
+                </ul>
+            </div>
+
+            <div class="compare-divider">
+                <div class="vs-circle">VS</div>
+            </div>
+
+            <div class="compare-card new-way">
+                <div class="card-status">Shushtaka-ს სავარჯიშო სისტემა</div>
+                <ul class="compare-list">
+                    <li>✅ შენ მონაცემებსა და მიზანზე მორგებული სავარჯიშო სისტემა</li>
+                    <li>✅ ვარჯიში როგორც სახლში ისევე დარბაზში</li>
+                    <li>✅ დეტალური ინსტრუქცია თითეულ ვარჯიშზე</li>
+                    <li>✅ დეტალური კალორაჟი</li>
+                    <li>✅ წინასწარ განსაზღვრული დრო სასურველი მიზანისთვის</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="vp-extra-info">
+            <div class="extra-item">
+                <span class="extra-icon">📈</span>
+                <p><strong>მაქსიმალური ჰიპერტროფია</strong> ეფექტური ვარჯიშის ხარჯზე</p>
+            </div>
+            <div class="extra-item">
+                <span class="extra-icon">🛡️</span>
+                <p><strong>უსაფრთხოება</strong> დაცული სახსრები და კუნთები</p>
+            </div>
+            <div class="extra-item">
+                <span class="extra-icon">🕒</span>
+                <p><strong>დროის ეკონომია</strong> შედეგი მინიმალურ დროში</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="testo-landscape">
+    <div class="testo-wrapper">
+        <div class="testo-img-box">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop" alt="Male Energy">
+        </div>
+
+        <div class="testo-info">
+            <div class="info-header">
+                <h2>ტესტოსტერონი</h2>
+                <p class="main-desc">
+                    ეს არ არის უბრალო ფაილი – ეს არის 30-დღიანი ბიოჰაკინგის სისტემა. ჩვენ ავხსენით ყველაფერი: კვების პროტოკოლებიდან დაწყებული, ძილის ჰიგიენით დასრულებული, რაც ბუნებრივად გაგიორმაგებს თავისუფალ ტესტოსტერონს.
+                </p>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <span class="icon">🧪</span>
+                    <div>
+                        <h4>რა არის?</h4>
+                        <p>მეცნიერულად დადასტურებული მეთოდები ჰორმონალური ბალანსისთვის.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <span class="icon">🚀</span>
+                    <div>
+                        <h4>რას მოგცემს?</h4>
+                        <p>მკვეთრად გაზრდილ ენერგიას, ლიბიდოს და კუნთურ მასას.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-action">
+                <div class="price-stack">
+
+                <span class="sale-tag">დაზოგე 50%</span>
+                <div class="prices">
+                    <span class="old-p">19.99₾</span>
+                    <span class="new-p">9.99₾</span>
+                </div>
+
+                </div>
+                <a href="#" class="cta-button">ჩამოტვირთე PDF</a>
+            </div>
+        </div>
+    </div>
+</section>
+    <script src="script.js"> </script>
+</body>
+</html>
