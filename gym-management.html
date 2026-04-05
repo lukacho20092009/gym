@@ -1,0 +1,4528 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GymPro — Management System</title>
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231A1A2E'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='16' fill='%23FF5722'%3E💪%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #F8F7F4;
+      --bg-card: #FFFFFF;
+      --bg-sidebar: #1A1A2E;
+      --text: #1A1A2E;
+      --text-light: #6B7280;
+      --accent: #FF5722;
+      --accent-hover: #E64A19;
+      --accent-soft: #FFF0EC;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --border: #E8E6E1;
+      --shadow: 0 2px 12px rgba(26, 26, 46, 0.08);
+      --shadow-lg: 0 8px 32px rgba(26, 26, 46, 0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --sidebar-w: 240px;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    /* ─── AUTH SCREEN ─── */
+    #auth-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg-sidebar);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #auth-screen.visible {
+      display: flex;
+    }
+
+    .auth-panel {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.4);
+      animation: modalIn 0.3s ease;
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .auth-logo-text {
+      font-family: var(--font-display);
+      font-size: 42px;
+      letter-spacing: 4px;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .auth-logo-sub {
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 9px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      background: none;
+      color: var(--text-light);
+      text-align: center;
+    }
+
+    .auth-tab.active {
+      background: #fff;
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(26, 26, 46, 0.1);
+    }
+
+    .auth-form {
+      display: none;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+
+    .auth-heading {
+      font-family: var(--font-display);
+      font-size: 26px;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .auth-subheading {
+      font-size: 13px;
+      color: var(--text-light);
+      margin-bottom: 24px;
+    }
+
+    .auth-note {
+      font-size: 12px;
+      color: var(--text-light);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+
+    .auth-note strong {
+      color: var(--text);
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--bg-sidebar);
+      min-height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-logo {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .logo-text {
+      font-family: var(--font-display);
+      font-size: 28px;
+      color: #fff;
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .sidebar-user-badge {
+      margin: 12px 16px 0;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex !important;
+      align-items: center;
+      gap: 10px;
+      visibility: visible !important;
+    }
+
+    .sidebar-user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .sidebar-user-role {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .sidebar-nav {
+      padding: 16px 12px;
+      flex: 1;
+    }
+
+    .nav-section {
+      margin-bottom: 24px;
+    }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.35);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 0 12px;
+      margin-bottom: 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 2px;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: #fff;
+    }
+
+    .nav-item.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .nav-item .nav-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      opacity: 0.9;
+    }
+
+    .nav-item[data-role-required] {
+      transition: opacity 0.2s;
+    }
+
+    /* ─── SIDEBAR BURGER MENU ─── */
+    .sidebar-toggle {
+      display: none !important;
+      position: fixed;
+      top: 10px;
+      right: 105px;
+      z-index: 1100;
+      width: 44px;
+      height: 44px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .sidebar-toggle:hover span {
+      background: white;
+    }
+
+    .sidebar-toggle span {
+      width: 22px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .sidebar-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .sidebar-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    /* Sidebar overlay for mobile */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 900;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* ─── MAIN ─── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 1px;
+      color: var(--text);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .role-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .role-pill.admin {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .role-pill.trainer {
+      background: #DBEAFE;
+      color: #1E40AF;
+    }
+
+    .role-pill.customer {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+
+    .api-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-light);
+      background: var(--bg);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    /* ─── CONTENT ─── */
+    .content {
+      padding: 32px;
+      flex: 1;
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ─── STATS GRID ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 22px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-light);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .stat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+
+    .stat-icon.orange {
+      background: var(--accent-soft);
+    }
+
+    .stat-icon.green {
+      background: #ECFDF5;
+    }
+
+    .stat-icon.blue {
+      background: #EFF6FF;
+    }
+
+    .stat-icon.purple {
+      background: #F5F3FF;
+    }
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 36px;
+      letter-spacing: 1px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    /* ─── CARDS ─── */
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      letter-spacing: 0.5px;
+    }
+
+    .card-body {
+      padding: 0;
+    }
+
+    /* ─── TABLE ─── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      background: var(--bg);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-light);
+      padding: 12px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table td {
+      padding: 14px 20px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+      background: var(--bg);
+    }
+
+    .data-table tr {
+      animation: fadeIn 0.3s ease both;
+    }
+
+    /* ─── BADGE ─── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+
+    .badge-warning {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .badge-danger {
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+
+    .badge-info {
+      background: #DBEAFE;
+      color: #1E40AF;
+    }
+
+    .badge-neutral {
+      background: #F3F4F6;
+      color: #374151;
+    }
+
+    .badge-admin {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .badge-trainer {
+      background: #DBEAFE;
+      color: #1E40AF;
+    }
+
+    .badge-customer {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+
+    /* ─── BUTTON ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--text-light);
+      background: var(--bg);
+    }
+
+    .btn-danger {
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+
+    .btn-danger:hover {
+      background: #FECACA;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-light);
+      border: none;
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ─── FORM ─── */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .form-label .required {
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.1);
+      background: #fff;
+    }
+
+    select.form-control {
+      cursor: pointer;
+    }
+
+    /* ─── MODAL ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 26, 46, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.2s;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg-card);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 24px 64px rgba(26, 26, 46, 0.25);
+      animation: modalIn 0.25s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    .modal-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--border);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    /* ─── GRID LAYOUTS ─── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* ─── SEARCH ─── */
+    .search-bar {
+      position: relative;
+    }
+
+    .search-bar input {
+      padding-left: 36px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      font-size: 15px;
+    }
+
+    /* ─── EMPTY STATE ─── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-light);
+    }
+
+    .empty-state .emoji {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .empty-state h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .empty-state p {
+      font-size: 14px;
+    }
+
+    /* ─── LOADING ─── */
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 40px auto;
+    }
+
+    .loading-row td {
+      text-align: center;
+      padding: 40px;
+    }
+
+    /* ─── TOAST ─── */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: var(--bg-sidebar);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: slideUp 0.3s ease;
+      max-width: 320px;
+    }
+
+    .toast.success {
+      border-left: 3px solid var(--success);
+    }
+
+    .toast.error {
+      border-left: 3px solid var(--danger);
+    }
+
+    .toast.info {
+      border-left: 3px solid #60A5FA;
+    }
+
+    /* ─── PAGE HEADER ─── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .page-heading {
+      font-family: var(--font-display);
+      font-size: 32px;
+      letter-spacing: 1px;
+    }
+
+    .page-sub {
+      font-size: 13px;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    /* ─── FILTERS ─── */
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* ─── AVATAR ─── */
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .user-email {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    /* ─── DASHBOARD GRID ─── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    /* ─── SCHEDULE CARD ─── */
+    .schedule-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .schedule-item:last-child {
+      border-bottom: none;
+    }
+
+    .schedule-time {
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      color: rgb(34, 34, 34);
+      min-width: 60px;
+    }
+
+    .schedule-class {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .schedule-trainer {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    .schedule-spots {
+      margin-left: auto;
+      font-size: 12px;
+      color: rgb(34, 34, 34);
+    }
+
+    /* ─── PROGRESS BAR ─── */
+    .progress-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+      transition: width 1s ease;
+    }
+
+    /* ─── TABS ─── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      width: fit-content;
+      border: 1px solid var(--border);
+    }
+
+    .tab {
+      padding: 7px 16px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      background: none;
+      color: var(--text-light);
+    }
+
+    .tab.active {
+      background: #fff;
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(26, 26, 46, 0.1);
+    }
+
+    /* ─── CONFIRM ─── */
+    .confirm-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #FEE2E2;
+      color: var(--danger);
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    /* ─── ACCESS DENIED ─── */
+    .access-denied {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px;
+      text-align: center;
+    }
+
+    .access-denied-icon {
+      font-size: 56px;
+      margin-bottom: 16px;
+    }
+
+    .access-denied h2 {
+      font-family: var(--font-display);
+      font-size: 28px;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .access-denied p {
+      color: var(--text-light);
+      font-size: 14px;
+      max-width: 300px;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1100px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .dash-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-toggle {
+        display: flex !important;
+      }
+
+      .sidebar-overlay {
+        display: block;
+      }
+
+      .sidebar {
+        transform: translateX(-100%);
+        z-index: 1000;
+        width: 280px;
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .topbar {
+        padding-left: 70px;
+      }
+
+      .content {
+        padding: 16px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .dash-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-card {
+        padding: 16px;
+      }
+
+      .stat-value {
+        font-size: 28px;
+      }
+
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .data-table {
+        font-size: 13px;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 10px 8px;
+      }
+
+      .filters {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .filters .search-bar {
+        max-width: 100% !important;
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .modal {
+        margin: 20px;
+        max-height: calc(100vh - 40px);
+      }
+
+      .calendar-grid {
+        min-width: 700px;
+      }
+
+      .cal-scroll-wrap {
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar-title {
+        font-size: 16px;
+      }
+
+      .page-heading {
+        font-size: 20px;
+      }
+
+      .card-header {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .btn {
+        padding: 8px 14px;
+        font-size: 13px;
+      }
+
+      .nav-item {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      .nav-icon {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    /* ─── ROLE ASSIGN INLINE ─── */
+    .inline-role-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .inline-role-row select {
+      flex: 1;
+    }
+
+    /* ─── WEEKLY CALENDAR ─── */
+    /* ─── NEW SCHEDULE CALENDAR ─── */
+    .weekly-calendar {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+
+    .calendar-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .calendar-nav button {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 15px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .calendar-nav button:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .cal-today-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-light);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font-body);
+    }
+    .cal-today-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .calendar-title {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      min-width: 170px;
+      text-align: center;
+    }
+
+    /* legend */
+    .cal-legend {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .cal-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-light); }
+    .cal-legend-dot  { width: 9px; height: 9px; border-radius: 3px; }
+
+    /* scroll container */
+    .cal-scroll-wrap {
+      overflow-x: auto;
+    }
+
+    /* the grid itself */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: 58px repeat(7, minmax(110px, 1fr));
+      min-width: 880px;
+      background: var(--bg-card);
+    }
+
+    /* column headers */
+    .cal-day-header {
+      height: 60px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .cal-day-header.cal-time-col-hdr {
+      border-right: 1px solid var(--border);
+    }
+    .cal-day-header.cal-today {
+      background: #FFF5F2;
+    }
+    .cal-dname {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--text-light);
+    }
+    .cal-dnum {
+      font-family: var(--font-display);
+      font-size: 24px; line-height: 1;
+      color: var(--text);
+    }
+    .cal-day-header.cal-today .cal-dname { color: var(--accent); }
+    .cal-day-header.cal-today .cal-dnum  { color: var(--accent); }
+
+    /* time label cells */
+    .cal-time-cell {
+      height: 52px;
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding: 5px 8px 0 0;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+    }
+    .cal-time-label {
+      font-size: 10px; font-weight: 600;
+      color: var(--text-light);
+      letter-spacing: .3px;
+    }
+
+    /* day column cells */
+    .cal-cell {
+      height: 52px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid rgba(232,230,225,.7);
+      position: relative;
+    }
+    .cal-cell:last-child { border-right: none; }
+    .cal-cell.cal-cell-today { background: #FFFCFB; }
+    .cal-cell.cal-half { border-bottom: 1px dashed #EDE9E4; }
+
+    /* class blocks */
+    .cal-block {
+      position: absolute;
+      left: 3px; right: 3px;
+      border-radius: 7px;
+      padding: 5px 8px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform .15s, box-shadow .15s;
+      z-index: 2;
+    }
+    .cal-block:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 14px rgba(0,0,0,.15);
+      z-index: 6;
+    }
+    .cal-b-time  { font-size: 9px; font-weight: 700; letter-spacing: .5px; opacity: .8; margin-bottom: 1px; }
+    .cal-b-name  { font-size: 11.5px; font-weight: 700; line-height: 1.2; margin-bottom: 1px; }
+    .cal-b-train { font-size: 10px; opacity: .75; }
+    .cal-b-dur   { font-size: 9px; opacity: .6; margin-top: 2px; }
+    .cal-b-actions { position: absolute; top: 3px; right: 3px; display: flex; gap: 2px; }
+    .cal-b-actions button {
+      width: 18px; height: 18px;
+      border: none; background: rgba(0,0,0,.12);
+      border-radius: 4px; cursor: pointer;
+      font-size: 9px; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: inherit;
+      transition: background .15s;
+    }
+    .cal-b-actions button:hover { background: rgba(0,0,0,.25); }
+
+    /* color variants – using existing project accent palette */
+    .cal-c-1 { background: #FFF0EC; color: #7A2D14; border-left: 3px solid #FF5722; }
+    .cal-c-2 { background: #EFF6FF; color: #1E3A6E; border-left: 3px solid #2196F3; }
+    .cal-c-3 { background: #ECFDF5; color: #065F46; border-left: 3px solid #10B981; }
+    .cal-c-4 { background: #F5F3FF; color: #3B0764; border-left: 3px solid #9C27B0; }
+    .cal-c-5 { background: #FFF7ED; color: #7C2D12; border-left: 3px solid #FF9800; }
+    .cal-c-6 { background: #FDF2F8; color: #701A4B; border-left: 3px solid #E91E8C; }
+
+    /* now line */
+    .cal-now-line {
+      position: absolute; left: 0; right: 0; height: 2px;
+      background: var(--danger); z-index: 8; pointer-events: none;
+    }
+    .cal-now-dot {
+      position: absolute; left: -4px; top: -4px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--danger);
+    }
+
+    /* tooltip */
+    .cal-tooltip {
+      display: none; position: fixed;
+      background: var(--bg-sidebar);
+      color: #fff; border-radius: 10px;
+      padding: 10px 13px; font-size: 12px; line-height: 1.6;
+      z-index: 999; max-width: 210px;
+      pointer-events: none;
+      box-shadow: 0 8px 30px rgba(0,0,0,.3);
+    }
+    .cal-tooltip.visible { display: block; }
+    .cal-tooltip strong { font-size: 13px; display: block; margin-bottom: 3px; }
+
+    /* empty state inside grid */
+    .cal-empty {
+      grid-column: 1 / -1;
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-light);
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════════ AUTH SCREEN ══════════════════════════════════════════════ -->
+  <div id="auth-screen" class="visible">
+    <div class="auth-panel">
+      <div class="auth-logo">
+        <div class="auth-logo-text">GYMPRO</div>
+        <div class="auth-logo-sub">Management System</div>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
+        <button class="auth-tab" onclick="switchAuthTab('register')">Register</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="auth-form active" id="auth-login">
+        <div class="auth-heading">Welcome back</div>
+        <div class="auth-subheading">Sign in to your account to continue</div>
+        <div class="form-group">
+          <label class="form-label">Email <span class="required">*</span></label>
+          <input class="form-control" id="l-email" type="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password <span class="required">*</span></label>
+          <input class="form-control" id="l-password" type="password" placeholder="••••••••"
+            autocomplete="current-password" />
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;" id="btn-login"
+          onclick="submitLogin()">Sign In</button>  
+      </div>
+
+      <!-- REGISTER -->
+      <div class="auth-form" id="auth-register">
+        <div class="auth-heading">Create account</div>
+        <div class="auth-subheading">New accounts are assigned the Customer role</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">First Name <span class="required">*</span></label>
+            <input class="form-control" id="reg-firstname" placeholder="Jane" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name <span class="required">*</span></label>
+            <input class="form-control" id="reg-lastname" placeholder="Smith" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Username <span class="required">*</span></label>
+          <input class="form-control" id="reg-username" placeholder="janesmith" autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email <span class="required">*</span></label>
+          <input class="form-control" id="reg-email" type="email" placeholder="jane@example.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password <span class="required">*</span></label>
+          <input class="form-control" id="reg-password" type="password" placeholder="••••••••"
+            autocomplete="new-password" />
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-control" id="reg-phone" type="tel" maxlength="9" placeholder="555123456" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address</label>
+            <input class="form-control" id="reg-address" placeholder="123 Main St" />
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;" id="btn-register"
+          onclick="submitRegister()">Create Account</button>
+      </div>
+
+      <!-- Back to Home -->
+      <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+        <a href="index.html" style="color: var(--text-light); text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-light)'">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Back to Home
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ SIDEBAR ══════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text">GYMPRO</div>
+      <div class="logo-sub">Management System</div>
+    </div>
+
+    <div class="sidebar-user-badge" id="sidebar-user-info">
+      <div class="sidebar-user-avatar" id="sidebar-avatar"></div>
+      <div>
+        <div class="sidebar-user-name" id="sidebar-name"></div>
+        <div class="sidebar-user-role" id="sidebar-role"></div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Overview</div>
+        <button class="nav-item active" onclick="navigate('dashboard', this)">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1" stroke-width="2" />
+            <rect x="14" y="3" width="7" height="7" rx="1" stroke-width="2" />
+            <rect x="14" y="14" width="7" height="7" rx="1" stroke-width="2" />
+            <rect x="3" y="14" width="7" height="7" rx="1" stroke-width="2" />
+          </svg>
+          Dashboard
+        </button>
+        <a href="index.html" class="nav-item" style="text-decoration: none;">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Home Page
+        </a>
+      </div>
+
+      <div class="nav-section" id="nav-section-members">
+        <div class="nav-section-label">Members</div>
+        <button class="nav-item" onclick="navigate('users', this)" data-role-required="Admin">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-width="2" stroke-linecap="round" />
+            <circle cx="9" cy="7" r="4" stroke-width="2" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke-width="2" stroke-linecap="round" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          Users
+        </button>
+        <button class="nav-item" onclick="navigate('memberships', this)" data-role-required="Admin">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="2" y="5" width="20" height="14" rx="2" stroke-width="2" />
+            <path d="M2 10h20" stroke-width="2" />
+          </svg>
+          Memberships
+        </button>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-label">Classes</div>
+        <button class="nav-item" onclick="navigate('gymclasses', this)">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M6.5 6.5h11M6.5 12h11M6.5 17.5h11" stroke-width="2" stroke-linecap="round" />
+            <rect x="2" y="3" width="20" height="18" rx="2" stroke-width="2" />
+          </svg>
+          Gym Classes
+        </button>
+        <button class="nav-item" onclick="navigate('schedules', this)">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2" />
+            <path d="M16 2v4M8 2v4M3 10h18" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          Schedules
+        </button>
+        <button class="nav-item" onclick="navigate('trainers', this)" data-role-required="Admin,Trainer">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4" stroke-width="2" />
+            <path d="M20 21a8 8 0 1 0-16 0" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          Trainers
+        </button>
+      </div>
+
+      <div class="nav-section" id="nav-section-system">
+        <div class="nav-section-label">System</div>
+        <button class="nav-item" onclick="navigate('roles', this)" data-role-required="Admin">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              stroke-width="2" stroke-linejoin="round" />
+          </svg>
+          Roles
+        </button>
+      </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <button class="nav-item" id="btn-api-info" onclick="showApiInfo()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" stroke-width="2" />
+          <path d="M12 8v4M12 16h.01" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        API Info
+      </button>
+      <button class="nav-item" onclick="logout()" style="color: rgba(255,87,34,0.8);">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <polyline points="16 17 21 12 16 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <line x1="21" y1="12" x2="9" y2="12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar Toggle Button -->
+  <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <!-- ══════════════════════════════════════════════ MAIN ══════════════════════════════════════════════ -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="page-heading">Dashboard</div>
+      <div class="topbar-right">
+        <span class="role-pill" id="topbar-role-pill"></span>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ══════════════ DASHBOARD ══════════════ -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <div class="page-heading" id="dash-welcome">Dashboard</div>
+            <div class="page-sub">Here's what's happening at your gym today</div>
+          </div>
+        </div>
+        <div class="stats-grid" id="dash-stats">
+          <div class="stat-card" id="stat-users-card">
+            <div class="stat-card-top">
+              <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-value" id="stat-users">—</div>
+            <div class="stat-sub">Registered members</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-label" id="stat-memberships-label">Active Memberships</div>
+            </div>
+            <div class="stat-value" id="stat-memberships">—</div>
+            <div class="stat-sub">Currently active</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-label">Gym Classes</div>
+            </div>
+            <div class="stat-value" id="stat-classes">—</div>
+            <div class="stat-sub">Available classes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-label">Schedules</div>
+            </div>
+            <div class="stat-value" id="stat-schedules">—</div>
+            <div class="stat-sub">Scheduled sessions</div>
+          </div>
+        </div>
+        <div class="dash-grid">
+          <div class="card" id="card-recent-users">
+            <div class="card-header">
+              <div class="card-title">Recent Users</div>
+              <button class="btn btn-outline btn-sm" id="btn-view-all-users" onclick="navigateToUsers()">View
+                All</button>
+            </div>
+            <div class="card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-users-table">
+                  <tr class="loading-row">
+                    <td colspan="3">
+                      <div class="spinner"></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Upcoming Schedules</div>
+            </div>
+            <div class="card-body" id="dash-schedules">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ USERS ══════════════ -->
+      <div class="page" id="page-users">
+        <div class="page-header">
+          <div>
+            <div class="page-heading">Users</div>
+            <div class="page-sub">Manage members and assign roles</div>
+          </div>
+          <button class="btn btn-primary" id="btn-add-user" onclick="openModal('modal-add-user')">+ Add User</button>
+        </div>
+        <div class="filters">
+          <div class="search-bar" style="flex:1;max-width:320px;">
+            <input class="form-control" type="text" id="users-search" placeholder="Search users..."
+              oninput="filterUsers()" />
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table">
+                <tr class="loading-row">
+                  <td colspan="6">
+                    <div class="spinner"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ MEMBERSHIPS ══════════════ -->
+      <div class="page" id="page-memberships">
+        <div class="page-header">
+          <div>
+            <div class="page-heading">Memberships</div>
+            <div class="page-sub">Track and manage member subscriptions</div>
+          </div>
+          <button class="btn btn-primary" id="btn-add-membership" onclick="openAddMembershipModal()">+ New
+            Membership</button>
+        </div>
+        <div class="filters">
+          <div class="search-bar" style="flex:1;max-width:320px;">
+            <input class="form-control" type="text" id="memberships-search" placeholder="Search memberships..."
+              oninput="filterMemberships()" />
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Member</th>
+                  <th>Type</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="memberships-table">
+                <tr class="loading-row">
+                  <td colspan="7">
+                    <div class="spinner"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ GYM CLASSES ══════════════ -->
+      <div class="page" id="page-gymclasses">
+        <div class="page-header">
+          <div>
+            <div class="page-heading">Gym Classes</div>
+            <div class="page-sub">All available fitness classes</div>
+          </div>
+          <button class="btn btn-primary" id="btn-add-class" onclick="openModal('modal-add-class')"
+            style="display:none">+ Add Class</button>
+        </div>
+        <div class="filters">
+          <div class="search-bar" style="flex:1;max-width:320px;">
+            <input class="form-control" type="text" id="classes-search" placeholder="Search classes..."
+              oninput="filterClasses()" />
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Class Name</th>
+                  <th>Description</th>
+                  <th>Duration</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="classes-table">
+                <tr class="loading-row">
+                  <td colspan="4">
+                    <div class="spinner"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ SCHEDULES ══════════════ -->
+      <div class="page" id="page-schedules">
+        <div class="page-header">
+          <div>
+            <div class="page-heading">Schedules</div>
+            <div class="page-sub">Class timetable and session management</div>
+          </div>
+          <button class="btn btn-primary" id="btn-add-schedule" onclick="openAddScheduleModal()" style="display:none">+
+            Add Schedule</button>
+        </div>
+        <div class="cal-tooltip" id="cal-tooltip"></div>
+
+        <!-- All Schedules Table -->
+        <div class="card" style="margin-top: 24px;">
+          <div class="card-header">
+            <div class="card-title">All Schedules</div>
+          </div>
+          <div class="card-body">
+            <!-- Search Filters -->
+            <div class="filters" style="margin-bottom: 16px;">
+              <div class="search-bar" style="flex:1;max-width:150px;">
+                <input class="form-control" type="text" id="schedules-search-trainer" placeholder="Search trainer..." oninput="filterSchedulesTable()" />
+              </div>
+              <div class="search-bar" style="flex:1;max-width:120px;">
+                <input class="form-control" type="number" id="schedules-search-trainer-id" placeholder="Trainer ID..." oninput="filterSchedulesTable()" />
+              </div>
+              <div class="search-bar" style="flex:1;max-width:150px;">
+                <input class="form-control" type="text" id="schedules-search-class" placeholder="Search class..." oninput="filterSchedulesTable()" />
+              </div>
+              <div class="search-bar" style="flex:1;max-width:150px;">
+                <input class="form-control" type="date" id="schedules-search-date" onchange="filterSchedulesTable()" />
+              </div>
+              <button class="btn btn-outline btn-sm" onclick="clearScheduleFilters()">Clear</button>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>Class</th>
+                  <th>Trainer</th>
+                  <th>Trainer ID</th>
+                  <th>Duration</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="schedules-table">
+                <tr class="loading-row">
+                  <td colspan="6">
+                    <div class="spinner"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ TRAINERS ══════════════ -->
+      <div class="page" id="page-trainers">
+        <div class="page-header">
+          <div>
+            <div class="page-heading">Trainers</div>
+            <div class="page-sub">Manage your fitness professionals</div>
+          </div>
+          <button class="btn btn-primary" id="btn-add-trainer" onclick="openModal('modal-add-trainer')"
+            style="display:none">+ Add Trainer</button>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Trainer</th>
+                  <th>User ID</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="trainers-table">
+                <tr class="loading-row">
+                  <td colspan="3">
+                    <div class="spinner"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ ROLES ══════════════ -->
+      <div class="page" id="page-roles">
+        <div class="page-header">
+          <div>
+            <div class="page-heading">Roles & Permissions</div>
+            <div class="page-sub">Admin-only: manage roles and assign them to users</div>
+          </div>
+
+        </div>
+        <div class="grid-2" style="margin-bottom:20px;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">All Roles</div>
+            </div>
+            <div class="card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Role Name</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="roles-table">
+                  <tr class="loading-row">
+                    <td colspan="3">
+                      <div class="spinner"></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Assign Role to User</div>
+            </div>
+            <div class="card-body" style="padding:20px;">
+              <div class="form-group">
+                <label class="form-label">Select User</label>
+                <select class="form-control" id="assign-userid">
+                  <option value="">Select user...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Select Role</label>
+                <select class="form-control" id="assign-roleid">
+                  <option value="">Select role...</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;"
+                onclick="submitAssignRole()">Assign Role</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+
+  <!-- ══════════════════════════════════ MODALS ══════════════════════════════════ -->
+
+  <!-- Add User -->
+  <div class="modal-overlay" id="modal-add-user">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Add User</div><button class="modal-close"
+          onclick="closeModal('modal-add-user')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="grid-2">
+          <div class="form-group"><label class="form-label">First Name <span class="required">*</span></label><input
+              class="form-control" id="u-firstname" placeholder="Jane" /></div>
+          <div class="form-group"><label class="form-label">Last Name <span class="required">*</span></label><input
+              class="form-control" id="u-lastname" placeholder="Smith" /></div>
+        </div>
+        <div class="form-group"><label class="form-label">Username <span class="required">*</span></label><input
+            class="form-control" id="u-username" placeholder="janesmith" /></div>
+        <div class="form-group"><label class="form-label">Email <span class="required">*</span></label><input
+            class="form-control" id="u-email" type="email" placeholder="jane@example.com" /></div>
+        <div class="form-group"><label class="form-label">Password <span class="required">*</span></label><input
+            class="form-control" id="u-password" type="password" placeholder="••••••••" /></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-control" id="u-phone" type="tel" maxlength="9" placeholder="555123456" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)" /></div>
+        <div class="form-group"><label class="form-label">Address</label><input class="form-control" id="u-address"
+            placeholder="123 Main St" /></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline"
+          onclick="closeModal('modal-add-user')">Cancel</button><button class="btn btn-primary"
+          onclick="submitAddUser()">Create User</button></div>
+    </div>
+  </div>
+
+  <!-- Edit User -->
+  <div class="modal-overlay" id="modal-edit-user">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Edit User</div><button class="modal-close"
+          onclick="closeModal('modal-edit-user')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="eu-id" />
+        <div class="form-group"><label class="form-label">First Name</label><input class="form-control"
+            id="eu-firstname" /></div>
+        <div class="form-group"><label class="form-label">Last Name</label><input class="form-control"
+            id="eu-lastname" /></div>
+        <div class="form-group"><label class="form-label">Username</label><input class="form-control"
+            id="eu-username" /></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-control" id="eu-email"
+            type="email" /></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline"
+          onclick="closeModal('modal-edit-user')">Cancel</button><button class="btn btn-primary"
+          onclick="submitEditUser()">Save Changes</button></div>
+    </div>
+  </div>
+
+  <!-- Add Class -->
+  <div class="modal-overlay" id="modal-add-class">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Add Gym Class</div><button class="modal-close"
+          onclick="closeModal('modal-add-class')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Class Name <span class="required">*</span></label><input
+            class="form-control" id="c-name" placeholder="Yoga, CrossFit..." /></div>
+        <div class="form-group"><label class="form-label">Description</label><input class="form-control"
+            id="c-description" placeholder="Brief description..." /></div>
+        <div class="form-group"><label class="form-label">Duration</label><input class="form-control" id="c-capacity"
+            type="number" placeholder="20" min="1" /></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline"
+          onclick="closeModal('modal-add-class')">Cancel</button><button class="btn btn-primary"
+          onclick="submitAddClass()">Create Class</button></div>
+    </div>
+  </div>
+
+  <!-- Edit Class -->
+  <div class="modal-overlay" id="modal-edit-class">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Edit Class</div><button class="modal-close"
+          onclick="closeModal('modal-edit-class')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="ec-id" />
+        <div class="form-group"><label class="form-label">Class Name <span class="required">*</span></label><input
+            class="form-control" id="ec-name" /></div>
+        <div class="form-group"><label class="form-label">Description</label><input class="form-control"
+            id="ec-description" /></div>
+        <div class="form-group"><label class="form-label">Duration</label><input class="form-control" id="ec-capacity"
+            type="number" min="1" /></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline"
+          onclick="closeModal('modal-edit-class')">Cancel</button><button class="btn btn-primary"
+          onclick="submitEditClass()">Save Changes</button></div>
+    </div>
+  </div>
+
+  <!-- Edit Trainer -->
+  <div class="modal-overlay" id="modal-edit-trainer">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Edit Trainer</div><button class="modal-close"
+          onclick="closeModal('modal-edit-trainer')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="et-id" />
+        <div class="form-group"><label class="form-label">First Name</label><input class="form-control"
+            id="et-firstname" /></div>
+        <div class="form-group"><label class="form-label">Last Name</label><input class="form-control"
+            id="et-lastname" /></div>
+        <div class="form-group"><label class="form-label">Username</label><input class="form-control"
+            id="et-username" /></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-control" id="et-email"
+            type="email" /></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline"
+          onclick="closeModal('modal-edit-trainer')">Cancel</button><button class="btn btn-primary"
+          onclick="submitEditTrainer()">Save Changes</button></div>
+    </div>
+  </div>
+
+  <!-- Edit Membership -->
+  <div class="modal-overlay" id="modal-edit-membership">
+    <div class="modal" style="max-width: 600px; max-height: 85vh; overflow-y: auto;">
+      <div class="modal-header">
+        <div class="modal-title">Edit Membership</div><button class="modal-close"
+          onclick="closeModal('modal-edit-membership')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="em-id" />
+        <input type="hidden" id="em-userid" />
+        <div class="form-group"><label class="form-label">Membership Type ID</label><input class="form-control"
+            id="em-type" type="number" /></div>
+        <div class="form-group"><label class="form-label">Price</label><input class="form-control" id="em-price"
+            type="number" step="0.01" /></div>
+        <div class="grid-2">
+          <div class="form-group"><label class="form-label">Start Date</label><input class="form-control"
+              id="em-startdate" type="date" /></div>
+          <div class="form-group"><label class="form-label">End Date</label><input class="form-control" id="em-enddate"
+              type="date" /></div>
+        </div>
+
+        <!-- Trainer Selection -->
+        <div class="form-group">
+          <label class="form-label">Select Trainer(s)</label>
+          <div id="em-trainers-container" style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 10px; background: var(--bg);">
+            <p style="color: var(--text-light); font-size: 13px; margin: 0;">Loading trainers...</p>
+          </div>
+          <small style="color: var(--text-light); font-size: 12px;">Select one or more trainers for this member</small>
+        </div>
+
+        <!-- Class Selection -->
+        <div class="form-group">
+          <label class="form-label">Select Class(es)</label>
+          <div id="em-classes-container" style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 10px; background: var(--bg);">
+            <p style="color: var(--text-light); font-size: 13px; margin: 0;">Loading classes...</p>
+          </div>
+          <small style="color: var(--text-light); font-size: 12px;">Select one or more classes for this member</small>
+        </div>
+
+        <!-- Schedule Date/Time for Classes -->
+        <div id="em-schedule-section" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Schedule Start Time <span class="required">*</span></label>
+            <input class="form-control" id="em-schedule-time" type="datetime-local" />
+            <small style="color: var(--text-light); font-size: 12px;">When should the first class start?</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duration per Class (minutes)</label>
+            <input class="form-control" id="em-duration" type="number" placeholder="60" min="15" value="60" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline"
+          onclick="closeModal('modal-edit-membership')">Cancel</button><button class="btn btn-primary"
+          onclick="submitEditMembership()">Save Changes</button></div>
+    </div>
+  </div>
+
+  <!-- Add Schedule -->
+  <div class="modal-overlay" id="modal-add-schedule">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Add Schedule</div><button class="modal-close"
+          onclick="closeModal('modal-add-schedule')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Gym Class <span class="required">*</span></label><select
+            class="form-control" id="s-classid">
+            <option value="">Select class...</option>
+          </select></div>
+        <div class="form-group"><label class="form-label">Trainer <span class="required">*</span></label><select
+            class="form-control" id="s-trainerid">
+            <option value="">Select trainer…</option>
+          </select></div>
+        <div class="form-group"><label class="form-label">Start Time <span class="required">*</span></label><input
+            class="form-control" id="s-starttime" type="datetime-local" /></div>
+        <div class="form-group"><label class="form-label">Duration (min)</label><input class="form-control"
+            id="s-duration" type="number" placeholder="60" /></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline"
+          onclick="closeModal('modal-add-schedule')">Cancel</button><button class="btn btn-primary"
+          onclick="submitAddSchedule()">Create Schedule</button></div>
+    </div>
+  </div>
+
+  <!-- Edit Schedule -->
+  <div class="modal-overlay" id="modal-edit-schedule">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Edit Schedule</div><button class="modal-close"
+          onclick="closeModal('modal-edit-schedule')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="es-id" />
+        <div class="form-group"><label class="form-label">Gym Class <span class="required">*</span></label><select
+            class="form-control" id="es-classid">
+            <option value="">Select class...</option>
+          </select></div>
+        <div class="form-group"><label class="form-label">Trainer <span class="required">*</span></label><select
+            class="form-control" id="es-trainerid">
+            <option value="">Select trainer…</option>
+          </select></div>
+        <div class="form-group"><label class="form-label">Start Time <span class="required">*</span></label><input
+            class="form-control" id="es-starttime" type="datetime-local" /></div>
+        <div class="form-group"><label class="form-label">Duration (min)</label><input class="form-control"
+            id="es-duration" type="number" placeholder="60" /></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline"
+          onclick="closeModal('modal-edit-schedule')">Cancel</button><button class="btn btn-primary"
+          onclick="submitEditSchedule()">Update Schedule</button></div>
+    </div>
+  </div>
+
+  <!-- Add Membership -->
+  <div class="modal-overlay" id="modal-add-membership">
+    <div class="modal" style="max-width: 600px; max-height: 85vh; overflow-y: auto;">
+      <div class="modal-header">
+        <div class="modal-title">Register Membership</div><button class="modal-close"
+          onclick="closeModal('modal-add-membership')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Member <span class="required">*</span></label><select
+            class="form-control" id="m-userid">
+            <option value="">Select member…</option>
+          </select></div>
+        <div class="form-group"><label class="form-label">Membership Type (ID) <span class="required">*</span></label>
+          <select class="form-control" id="m-type">
+            <option value="1">Type 1 — Monthly</option>
+            <option value="2">Type 2 — Quarterly</option>
+            <option value="3">Type 3 — Annual</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Price <span class="required">*</span></label><input
+            class="form-control" id="m-price" type="number" step="0.01" min="0.01" placeholder="29.99" /></div>
+        <div class="grid-2">
+          <div class="form-group"><label class="form-label">Start Date <span class="required">*</span></label><input
+              class="form-control" id="m-startdate" type="date" /></div>
+          <div class="form-group"><label class="form-label">End Date <span class="required">*</span></label><input
+              class="form-control" id="m-enddate" type="date" /></div>
+        </div>
+
+        <!-- Trainer Selection -->
+        <div class="form-group">
+          <label class="form-label">Select Trainer(s)</label>
+          <div id="m-trainers-container" style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 10px; background: var(--bg);">
+            <p style="color: var(--text-light); font-size: 13px; margin: 0;">Loading trainers...</p>
+          </div>
+          <small style="color: var(--text-light); font-size: 12px;">Select one or more trainers for this member</small>
+        </div>
+
+        <!-- Class Selection -->
+        <div class="form-group">
+          <label class="form-label">Select Class(es)</label>
+          <div id="m-classes-container" style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 10px; background: var(--bg);">
+            <p style="color: var(--text-light); font-size: 13px; margin: 0;">Loading classes...</p>
+          </div>
+          <small style="color: var(--text-light); font-size: 12px;">Select one or more classes for this member</small>
+        </div>
+
+        <!-- Schedule Date/Time for Classes -->
+        <div id="m-schedule-section" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Schedule Start Time <span class="required">*</span></label>
+            <input class="form-control" id="m-schedule-time" type="datetime-local" />
+            <small style="color: var(--text-light); font-size: 12px;">When should the first class start?</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duration per Class (minutes)</label>
+            <input class="form-control" id="m-duration" type="number" placeholder="60" min="15" value="60" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline"
+          onclick="closeModal('modal-add-membership')">Cancel</button><button class="btn btn-primary"
+          onclick="submitAddMembership()">Register</button></div>
+    </div>
+  </div>
+
+  <!-- Add Trainer -->
+  <div class="modal-overlay" id="modal-add-trainer">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Add Trainer</div><button class="modal-close"
+          onclick="closeModal('modal-add-trainer')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="grid-2">
+          <div class="form-group"><label class="form-label">First Name <span class="required">*</span></label><input
+              class="form-control" id="t-firstname" placeholder="Jane" /></div>
+          <div class="form-group"><label class="form-label">Last Name <span class="required">*</span></label><input
+              class="form-control" id="t-lastname" placeholder="Smith" /></div>
+        </div>
+        <div class="form-group"><label class="form-label">Username <span class="required">*</span></label><input
+            class="form-control" id="t-username" placeholder="janesmith" /></div>
+        <div class="form-group"><label class="form-label">Email <span class="required">*</span></label><input
+            class="form-control" id="t-email" type="email" placeholder="trainer@example.com" /></div>
+        <div class="form-group"><label class="form-label">Password <span class="required">*</span></label><input
+            class="form-control" id="t-password" type="password" placeholder="••••••••" /></div>
+        <div class="form-group"><label class="form-label">Specialty</label><input class="form-control" id="t-specialty"
+            placeholder="Yoga, Strength Training..." /></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline"
+          onclick="closeModal('modal-add-trainer')">Cancel</button><button class="btn btn-primary"
+          onclick="submitAddTrainer()">Add Trainer</button></div>
+    </div>
+  </div>
+
+  <!-- Add Role -->
+  <div class="modal-overlay" id="modal-add-role">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Add Role</div><button class="modal-close"
+          onclick="closeModal('modal-add-role')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Role Name <span class="required">*</span></label><input
+            class="form-control" id="r-name" placeholder="Admin, Member, Trainer..." /></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline"
+          onclick="closeModal('modal-add-role')">Cancel</button><button class="btn btn-primary"
+          onclick="submitAddRole()">Create Role</button></div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete -->
+  <div class="modal-overlay" id="modal-confirm">
+    <div class="modal" style="max-width:380px;">
+      <div class="modal-body" style="text-align:center;padding:32px 24px;">
+        <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;" id="confirm-title">Delete Item?</h3>
+        <p style="font-size:14px;color:var(--text-light);" id="confirm-msg">This action cannot be undone.</p>
+      </div>  
+      <div class="modal-footer" style="justify-content:center;">
+        <button class="btn btn-outline" onclick="closeModal('modal-confirm')">Cancel</button>
+        <button class="btn btn-danger" id="confirm-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Info -->
+  <div class="modal-overlay" id="modal-api-info">
+    <div class="modal" style="max-width:440px;">
+      <div class="modal-header">
+        <div class="modal-title">API Information</div><button class="modal-close"
+          onclick="closeModal('modal-api-info')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:14px;color:var(--text-light);margin-bottom:16px;">Connected to Gym Membership Management API
+        </p>
+        <div
+          style="background:var(--bg);border-radius:8px;padding:14px;font-size:13px;font-family:monospace;word-break:break-all;border:1px solid var(--border);">
+          https://gym-production-b515.up.railway.app</div>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span
+              style="color:var(--text-light);">Version</span><span style="font-weight:600;">v1</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span
+              style="color:var(--text-light);">Framework</span><span style="font-weight:600;">.NET 9.0 ASP.NET
+              Core</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span
+              style="color:var(--text-light);">Host</span><span style="font-weight:600;">Railway.app</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span
+              style="color:var(--text-light);">Swagger Docs</span><a
+              href="https://gym-production-b515.up.railway.app/swagger/index.html" target="_blank"
+              style="color:var(--accent);font-weight:600;">Open ↗</a></div>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal('modal-api-info')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toasts"></div>
+
+  <!-- ══════════════════════════════════ SCRIPT ══════════════════════════════════ -->
+  <script>
+    const BASE = 'https://gym-production-b515.up.railway.app';
+
+    // ─── AUTH STATE ───────────────────────────────────────────────────────────────
+    let _authToken = null;
+    let _currentUser = null; // { id, username, firstName, lastName, email, role }
+
+    const ROLE_ADMIN = 'Admin';
+    const ROLE_TRAINER = 'Trainer';
+    const ROLE_CUSTOMER = 'Customer';
+
+    function getRole() { return (_currentUser && _currentUser.role) || ROLE_CUSTOMER; }
+    function isAdmin() { return getRole() === ROLE_ADMIN; }
+    function isTrainer() { return getRole() === ROLE_TRAINER; }
+
+    // Persist session in localStorage
+    function saveSession() {
+      if (_authToken) localStorage.setItem('gym_token', _authToken);
+      if (_currentUser) localStorage.setItem('gym_user', JSON.stringify(_currentUser));
+    }
+
+    function restoreSession() {
+      _authToken = localStorage.getItem('gym_token');
+      const u = localStorage.getItem('gym_user');
+      if (u) { try { _currentUser = JSON.parse(u); } catch { } }
+      return !!_authToken && !!_currentUser;
+    }
+
+    function clearSession() {
+      _authToken = null; _currentUser = null;
+      localStorage.removeItem('gym_token');
+      localStorage.removeItem('gym_user');
+    }
+
+    // ─── AUTH UI ──────────────────────────────────────────────────────────────────
+    function showAuthScreen() {
+      document.getElementById('auth-screen').classList.add('visible');
+    }
+
+    function hideAuthScreen() {
+      document.getElementById('auth-screen').classList.remove('visible');
+    }
+
+    function switchAuthTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach((t, i) => {
+        const tabs = ['login', 'register'];
+        t.classList.toggle('active', tabs[i] === tab);
+      });
+      document.getElementById('auth-login').classList.toggle('active', tab === 'login');
+      document.getElementById('auth-register').classList.toggle('active', tab === 'register');
+    }
+
+    async function submitLogin() {
+      const email = document.getElementById('l-email').value.trim();
+      const password = document.getElementById('l-password').value;
+      if (!email || !password) { 
+        confirmDialog('Login Error', 'Email and password are required. Please fill in both fields.', () => {});
+        return; 
+      }
+      const btn = document.getElementById('btn-login');
+      btn.disabled = true; btn.textContent = 'Signing in…';
+      try {
+        const res = await apiNoAuth('/api/User/Login', 'POST', { email, password });
+        // The API may return a token and/or user info
+        const token = res?.token ?? res?.accessToken ?? res?.jwtToken ?? null;
+        _authToken = token;
+
+        // Try to get user profile
+        let profile = res?.user ?? res?.userInfo ?? null;
+        if (!profile && res?.userId) {
+          profile = { id: res.userId, email };
+        }
+        if (!profile) {
+          // Attempt to fetch profile using token
+          profile = await apiAuth('/api/User/GetProfile/' + (res?.userId || '')).catch(() => null)
+            ?? { email };
+        }
+
+        // Determine role from login response or profile
+        const roleName = res?.roleId ?? res?.RoleId ?? res?.role ?? res?.roleName ?? profile?.roleId ?? profile?.RoleId ?? profile?.role ?? profile?.roleName ?? ROLE_CUSTOMER;
+        _currentUser = { ...normalizeUser(profile || {}), role: normalizeRoleName(roleName), email };
+        saveSession();
+        onLoginSuccess();
+      } catch (e) {
+        confirmDialog('Login Failed', 'Unable to sign in. Please check your email and password and try again.', () => {});
+        btn.disabled = false; btn.textContent = 'Sign In';
+      }
+    }
+
+    async function submitRegister() {
+      const body = {
+        firstName: document.getElementById('reg-firstname').value.trim(),
+        lastName: document.getElementById('reg-lastname').value.trim(),
+        username: document.getElementById('reg-username').value.trim(),
+        email: document.getElementById('reg-email').value.trim(),
+        password: document.getElementById('reg-password').value,
+        phone: document.getElementById('reg-phone').value.trim(),
+        address: document.getElementById('reg-address').value.trim(),
+      };
+      if (!body.username || !body.password) { 
+        confirmDialog('Registration Error', 'Username and password are required. Please fill in both fields.', () => {});
+        return; 
+      }
+      if (!body.email) { 
+        confirmDialog('Registration Error', 'Email is required. Please enter your email address.', () => {});
+        return; 
+      }
+      if (!body.firstName || !body.lastName) { 
+        confirmDialog('Registration Error', 'First and last name are required. Please fill in both fields.', () => {});
+        return; 
+      }
+      const btn = document.getElementById('btn-register');
+      btn.disabled = true; btn.textContent = 'Creating…';
+      try {
+        await apiNoAuth('/api/User/Register', 'POST', body);
+        toast('Account created! You can now sign in.', 'success');
+        // Auto-switch to login and prefill email
+        switchAuthTab('login');
+        document.getElementById('l-email').value = body.email;
+        btn.disabled = false; btn.textContent = 'Create Account';
+      } catch (e) {
+        confirmDialog('Registration Failed', 'Unable to create account. This email or username may already be in use. Please try different credentials.', () => {});
+        btn.disabled = false; btn.textContent = 'Create Account';
+      }
+    }
+
+    function normalizeRoleName(r) {
+      if (!r) return ROLE_CUSTOMER;
+      
+      // Handle numeric RoleId values
+      if (typeof r === 'number') {
+        if (r === 1) return ROLE_ADMIN;
+        if (r === 2) return ROLE_TRAINER;
+        if (r === 3) return ROLE_CUSTOMER;
+      }
+      
+      // Handle string-based role names
+      const s = String(r).toLowerCase();
+      if (s.includes('admin') || s === '1') return ROLE_ADMIN;
+      if (s.includes('trainer') || s === '2') return ROLE_TRAINER;
+      if (s.includes('customer') || s === '3') return ROLE_CUSTOMER;
+      
+      return ROLE_CUSTOMER;
+    }
+
+    async function onLoginSuccess() {
+      // If firstName/lastName are missing, try to fetch the full profile
+      if (!_currentUser.firstName && !_currentUser.lastName && _currentUser.id) {
+        try {
+          const fullProfile = await apiAuth('/api/User/GetProfile/' + _currentUser.id).catch(() => null);
+          if (fullProfile && (fullProfile.firstName || fullProfile.lastName)) {
+            _currentUser = { ..._currentUser, ...normalizeUser(fullProfile) };
+            saveSession();
+          }
+        } catch (e) { /* silently ignore */ }
+      }
+
+      hideAuthScreen();
+      applyRbacUI();
+      const activeNav = document.querySelector('.nav-item.active') || document.querySelector('.nav-item');
+      navigate('dashboard', activeNav);
+      toast(`Welcome, ${_currentUser.firstName || _currentUser.username}! (${getRole()})`, 'success');
+    }
+
+    function logout() {
+      confirmDialog('Logout?', 'You will be returned to the login page.', async () => {
+        try { await apiAuth('/api/User/Logout', 'POST'); } catch (e) { }
+        clearSession();
+        showAuthScreen();
+        toast('Logged out successfully', 'info');
+      });
+    }
+
+    // ─── SIDEBAR TOGGLE ───────────────────────────────────────────────────────────
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.getElementById('sidebar-toggle');
+      const overlay = document.getElementById('sidebar-overlay');
+      
+      sidebar.classList.toggle('active');
+      toggleBtn.classList.toggle('active');
+      overlay.classList.toggle('active');
+      
+      // Prevent body scroll when sidebar is open
+      if (sidebar.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    }
+
+    // Close sidebar when clicking on a nav item on mobile
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          const sidebar = document.getElementById('sidebar');
+          if (sidebar.classList.contains('active')) {
+            toggleSidebar();
+          }
+        }
+      });
+    });
+
+    // ─── RBAC UI ──────────────────────────────────────────────────────────────────
+    function applyRbacUI() {
+      if (!_currentUser) {
+        return;
+      }
+      const role = getRole();
+      const name = [_currentUser.firstName, _currentUser.lastName].filter(Boolean).join(' ') || _currentUser.username || '?';
+      
+      // Sidebar user badge
+      const avatarEl = document.getElementById('sidebar-avatar');
+      const nameEl = document.getElementById('sidebar-name');
+      const roleEl = document.getElementById('sidebar-role');
+      
+      if (avatarEl) avatarEl.textContent = initials(name);
+      if (nameEl) nameEl.textContent = name;
+      if (roleEl) roleEl.textContent = role;
+
+      // Topbar role pill
+      const pill = document.getElementById('topbar-role-pill');
+      if (pill) {
+        pill.className = 'role-pill ' + role.toLowerCase();
+        pill.textContent = role;
+      }
+
+      // Admin-only nav sections
+      const navSystems = document.getElementById('nav-section-system');
+      if (navSystems) navSystems.style.display = isAdmin() ? '' : 'none';
+      const navMembers = document.getElementById('nav-section-members');
+      if (navMembers) navMembers.style.display = isAdmin() ? '' : 'none';
+
+      // Private buttons
+      const btnApiInfo = document.getElementById('btn-api-info');
+      if (btnApiInfo) btnApiInfo.style.display = isAdmin() ? '' : 'none';
+
+      const adminOnly = document.querySelectorAll('#btn-add-user, #btn-add-membership, #btn-add-trainer, #btn-view-all-users');
+      adminOnly.forEach(b => { if (b) b.style.display = isAdmin() ? '' : 'none'; });
+
+      const adminTrainer = document.querySelectorAll('#btn-add-class, #btn-add-schedule');
+      adminTrainer.forEach(b => { if (b) b.style.display = (isAdmin() || isTrainer()) ? '' : 'none'; });
+    }
+
+    // Check if user can perform an action; show toast if not
+    function requireRole(requiredRole) {
+      const role = getRole();
+      if (requiredRole === ROLE_ADMIN && !isAdmin()) {
+        toast('This action requires Admin role', 'error'); return false;
+      }
+      if (requiredRole === ROLE_TRAINER && role === ROLE_CUSTOMER) {
+        toast('This action requires Trainer or Admin role', 'error'); return false;
+      }
+      return true;
+    }
+
+    // ─── NAVIGATION ───────────────────────────────────────────────────────────────
+    let currentPage = 'dashboard';
+
+    function navigate(page, btn) {
+      // RBAC check for protected pages
+      const protectedPages = { users: ROLE_ADMIN, memberships: ROLE_ADMIN, roles: ROLE_ADMIN };
+      const trainerPages = { trainers: ROLE_TRAINER, schedules: ROLE_TRAINER, gymclasses: ROLE_TRAINER };
+
+      if (protectedPages[page] && !isAdmin()) {
+        showAccessDenied(page);
+        return;
+      }
+
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('page-' + page).classList.add('active');
+      if (btn) btn.classList.add('active');
+
+      const labels = { dashboard: 'Dashboard', users: 'Users', memberships: 'Memberships', gymclasses: 'Gym Classes', schedules: 'Schedules', trainers: 'Trainers', roles: 'Roles & Permissions' };
+      document.getElementById('page-heading').textContent = labels[page] || page;
+      currentPage = page;
+      loadPage(page);
+    }
+
+    function navigateToUsers() {
+      navigate('users', document.querySelector('[onclick*="navigate(\'users\'"]'));
+    }
+
+    function showAccessDenied(page) {
+      toast('Access denied — Admin role required', 'error');
+    }
+
+    function refreshCurrentPage() { loadPage(currentPage); }
+
+    function loadPage(page) {
+      switch (page) {
+        case 'dashboard': loadDashboard(); break;
+        case 'users': loadUsers(); break;
+        case 'memberships': loadMemberships(); break;
+        case 'gymclasses': loadClasses(); break;
+        case 'schedules': loadSchedules(); break;
+        case 'trainers': loadTrainers(); break;
+        case 'roles': loadRoles(); break;
+      }
+    }
+
+    // ─── API HELPERS ──────────────────────────────────────────────────────────────
+    async function apiNoAuth(path, method = 'GET', body = null) {
+      const opts = { method, headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } };
+      if (body) opts.body = JSON.stringify(body);
+      const r = await fetch(BASE + path, opts);
+      if (!r.ok) {
+        const txt = await r.text().catch(() => '');
+        throw new Error(`HTTP ${r.status}: ${txt.substring(0, 300)}`);
+      }
+      if (r.status === 204 || r.headers.get('content-length') === '0') return null;
+      const ct = r.headers.get('content-type') || '';
+      return ct.includes('application/json') ? await r.json() : await r.text();
+    }
+
+    async function apiAuth(path, method = 'GET', body = null) {
+      const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+      if (_authToken) headers['Authorization'] = 'Bearer ' + _authToken;
+      const opts = { method, headers };
+      if (body) opts.body = JSON.stringify(body);
+      const r = await fetch(BASE + path, opts);
+      if (r.status === 401) { clearSession(); showAuthScreen(); throw new Error('Session expired. Please log in again.'); }
+      if (!r.ok) {
+        const txt = await r.text().catch(() => '');
+        throw new Error(`HTTP ${r.status}: ${txt.substring(0, 300)}`);
+      }
+      if (r.status === 204 || r.headers.get('content-length') === '0') return null;
+      const ct = r.headers.get('content-type') || '';
+      return ct.includes('application/json') ? await r.json() : await r.text();
+    }
+
+    // Unified api call (uses auth if token present, falls back to no-auth)
+    async function api(path, method = 'GET', body = null) {
+      return _authToken ? apiAuth(path, method, body) : apiNoAuth(path, method, body);
+    }
+
+    // ─── TOAST ────────────────────────────────────────────────────────────────────
+    function toast(msg, type = 'info') {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+      el.innerHTML = `<span>${icon}</span><span>${escapeHtml(msg)}</span>`;
+      document.getElementById('toasts').appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    // ─── MODAL ────────────────────────────────────────────────────────────────────
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { 
+      document.getElementById(id).classList.remove('open');
+      // Re-enable trainer select if closing add schedule modal
+      if (id === 'modal-add-schedule') {
+        const trainerSel = document.getElementById('s-trainerid');
+        if (trainerSel) trainerSel.disabled = false;
+      }
+    }
+    document.querySelectorAll('.modal-overlay').forEach(o => {
+      o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+    });
+    function showApiInfo() { openModal('modal-api-info'); }
+
+    // Renamed to avoid conflict with native confirm()
+    function confirmDialog(title, msg, cb) {
+      document.getElementById('confirm-title').textContent = title;
+      document.getElementById('confirm-msg').textContent = msg;
+      const btn = document.getElementById('confirm-btn');
+      btn.onclick = () => { closeModal('modal-confirm'); cb(); };
+      openModal('modal-confirm');
+    }
+
+    // ─── HELPERS ──────────────────────────────────────────────────────────────────
+    function initials(name) {
+      if (!name || name === '?') return '?';
+      const parts = (name || '').split(' ').filter(Boolean);
+      if (parts.length === 0) return '?';
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return parts.map(w => w[0]).join('').toUpperCase().substring(0, 2);
+    }
+
+    function fmtDate(d) {
+      if (!d) return '—';
+      try { return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); } catch { return d; }
+    }
+
+    function fmtDateTime(d) {
+      if (!d) return '—';
+      try { return new Date(d).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch { return d; }
+    }
+
+    function membershipBadge(status) {
+      const s = (status || '').toLowerCase();
+      if (s === 'active') return '<span class="badge badge-success">● Active</span>';
+      if (s === 'expired') return '<span class="badge badge-danger">● Expired</span>';
+      if (s === 'pending') return '<span class="badge badge-warning">● Pending</span>';
+      return `<span class="badge badge-neutral">${escapeHtml(status || 'Unknown')}</span>`;
+    }
+
+    function roleBadge(role) {
+      const r = (role || '').toLowerCase();
+      if (r.includes('admin')) return '<span class="badge badge-admin">Admin</span>';
+      if (r.includes('trainer')) return '<span class="badge badge-trainer">Trainer</span>';
+      return '<span class="badge badge-customer">Customer</span>';
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function displayUserName(u) {
+      if (!u) return '—';
+      const name = [u.firstName, u.lastName].filter(Boolean).join(' ') || u.username;
+      return name || ('User #' + u.id);
+    }
+
+    function settledVal(r, fallback = []) {
+      return r && r.status === 'fulfilled' ? r.value : fallback;
+    }
+
+    // ─── CACHE ────────────────────────────────────────────────────────────────────
+    let _roles = [], _classes = [], _users = [], _allUsersResolved = [], _trainers = [], _memberships = [], _schedules = [];
+
+    function normalizeUser(dto) {
+      if (!dto) return dto;
+      return { ...dto, id: dto.userId ?? dto.id, email: dto.email ?? '' };
+    }
+
+    function normalizeRole(r) {
+      if (!r) return r;
+      return { id: r.roleId ?? r.id, name: r.roleName ?? r.name, roleName: r.roleName ?? r.name };
+    }
+
+    function normalizeClass(c) {
+      if (!c) return c;
+      const name = c.gymClassName ?? c.name ?? '—';
+      return { ...c, id: c.id, name, gymClassName: c.gymClassName ?? c.name };
+    }
+
+    function normalizeMembership(m) {
+      if (!m) return m;
+      const active = m.isActive === true || (m.status || '').toLowerCase() === 'active';
+      return { ...m, membershipType: m.membershipTypeName ?? m.membershipType ?? m.type, status: active ? 'active' : (m.status || 'inactive') };
+    }
+
+    function normalizeSchedule(s) {
+      if (!s) return s;
+      return { ...s, startTime: s.scheduledDateTime ?? s.startTime, durationMinutes: s.duration ?? s.durationMinutes, trainerId: s.userId ?? s.trainerId };
+    }
+
+    function asUserArray(raw) {
+      if (!raw) return [];
+      if (Array.isArray(raw)) return raw;
+      if (Array.isArray(raw.data)) return raw.data;
+      if (Array.isArray(raw.users)) return raw.users;
+      return [];
+    }
+
+    const KNOWN_USER_IDS_KEY = 'gym-known-user-ids';
+    const MAX_SEEN_USER_ID_KEY = 'gym-max-seen-user-id';
+
+    function readKnownUserIds() {
+      try { return JSON.parse(localStorage.getItem(KNOWN_USER_IDS_KEY) || '[]'); } catch { return []; }
+    }
+
+    function rememberUserId(id) {
+      const ids = new Set(readKnownUserIds());
+      ids.add(Number(id));
+      localStorage.setItem(KNOWN_USER_IDS_KEY, JSON.stringify([...ids]));
+      bumpMaxSeenUserId(id);
+    }
+
+    function forgetUserId(id) {
+      const ids = new Set(readKnownUserIds());
+      ids.delete(Number(id));
+      localStorage.setItem(KNOWN_USER_IDS_KEY, JSON.stringify([...ids]));
+    }
+
+    function readMaxSeenUserId() {
+      const v = parseInt(localStorage.getItem(MAX_SEEN_USER_ID_KEY) || '0', 10);
+      return Number.isNaN(v) ? 0 : v;
+    }
+
+    function bumpMaxSeenUserId(id) {
+      const n = Number(id);
+      if (!n || Number.isNaN(n)) return;
+      const p = readMaxSeenUserId();
+      if (n > p) localStorage.setItem(MAX_SEEN_USER_ID_KEY, String(n));
+    }
+
+    const KNOWN_TRAINER_IDS_KEY = 'gym-known-trainer-ids';
+    function readKnownTrainerIds() {
+      try { return JSON.parse(localStorage.getItem(KNOWN_TRAINER_IDS_KEY) || '[]'); } catch { return []; }
+    }
+    function rememberTrainerId(id) {
+      const ids = new Set(readKnownTrainerIds());
+      ids.add(Number(id));
+      localStorage.setItem(KNOWN_TRAINER_IDS_KEY, JSON.stringify([...ids]));
+    }
+    function forgetTrainerId(id) {
+      const ids = new Set(readKnownTrainerIds());
+      ids.delete(Number(id));
+      localStorage.setItem(KNOWN_TRAINER_IDS_KEY, JSON.stringify([...ids]));
+    }
+
+    async function fetchAllUsersResolved() {
+      const sort = arr => arr.filter(u => u && u.id != null).sort((a, b) => (Number(a.id) || 0) - (Number(b.id) || 0));
+      try {
+        const raw = await api('/api/User/GetAllUsers');
+        return sort(asUserArray(raw).map(normalizeUser));
+      } catch {
+        try {
+          const raw2 = await api('/api/Admin/GetAllMembers');
+          return sort(asUserArray(raw2).map(normalizeUser));
+        } catch { return []; }
+      }
+    }
+
+    async function collectTrainerIdHints() {
+      const ids = new Set(readKnownTrainerIds());
+      const raw = await api('/api/Admin/GetAllTrainers').catch(() => []);
+      asUserArray(raw).forEach(t => { const u = normalizeUser(t); if (u.id != null) ids.add(Number(u.id)); });
+      return ids;
+    }
+
+    async function fetchAllTrainersResolved() {
+      const listRaw = await api('/api/Admin/GetAllTrainers').catch(() => []);
+      const fromList = asUserArray(listRaw).map(normalizeUser);
+      const byId = new Map(fromList.filter(u => u.id != null).map(u => [Number(u.id), u]));
+      const hintIds = await collectTrainerIdHints();
+      fromList.forEach(u => { if (u.id != null) hintIds.add(Number(u.id)); });
+      const toFetch = [...hintIds].filter(id => !byId.has(id));
+      const results = await Promise.allSettled(toFetch.map(id => api('/api/Admin/GetUserById/' + id)));
+      results.forEach(r => {
+        if (r.status !== 'fulfilled' || !r.value) return;
+        const u = normalizeUser(r.value);
+        if (u.id == null) return;
+        byId.set(Number(u.id), u);
+      });
+      return Array.from(byId.values()).sort((a, b) => (Number(a.id) || 0) - (Number(b.id) || 0));
+    }
+
+    async function buildTrainerIdSet(preloaded) {
+      const set = new Set(readKnownTrainerIds());
+      const raw = preloaded === undefined ? await api('/api/Admin/GetAllTrainers').catch(() => []) : preloaded;
+      asUserArray(raw).forEach(t => { const u = normalizeUser(t); if (u.id != null) set.add(Number(u.id)); });
+      return set;
+    }
+
+    const MEMBER_CLASSES_KEY = 'gym-member-classes';
+
+    function getMemberClassAssociations() {
+      try {
+        return JSON.parse(localStorage.getItem(MEMBER_CLASSES_KEY) || '{}');
+      } catch { return {}; }
+    }
+
+    function storeMemberClassAssociation(memberId, classId, trainerId, scheduledDateTime, duration) {
+      const associations = getMemberClassAssociations();
+      const memberKey = String(memberId);
+      if (!associations[memberKey]) {
+        associations[memberKey] = [];
+      }
+      associations[memberKey].push({
+        classId: classId,
+        trainerId: trainerId,
+        scheduledDateTime: scheduledDateTime,
+        duration: duration,
+        addedAt: new Date().toISOString()
+      });
+      localStorage.setItem(MEMBER_CLASSES_KEY, JSON.stringify(associations));
+    }
+
+    function getMemberClasses(memberId) {
+      const associations = getMemberClassAssociations();
+      return associations[String(memberId)] || [];
+    }
+
+    function isScheduleForMember(schedule, memberId) {
+      // First check if the API returns a memberId field
+      if (schedule.memberId && schedule.memberId == memberId) return true;
+      if (schedule.userId == memberId) return true;
+
+      // Check local storage associations
+      const memberClasses = getMemberClasses(memberId);
+      if (memberClasses.length === 0) return false;
+
+      const scheduleClassId = schedule.gymClassId;
+      const scheduleTime = new Date(schedule.startTime || schedule.scheduledDateTime);
+
+      return memberClasses.some(mc => {
+        const match = mc.classId == scheduleClassId;
+        if (!match) return false;
+        const mcTime = new Date(mc.scheduledDateTime);
+        // Allow 5 minute tolerance for time matching
+        const diff = Math.abs(scheduleTime.getTime() - mcTime.getTime());
+        return diff < 5 * 60 * 1000;
+      });
+    }
+
+    function filterOutTrainers(allUsers, trainerIdSet) {
+      return allUsers.filter(u => u.id != null && !trainerIdSet.has(Number(u.id)));
+    }
+
+    async function setFullUserCaches(all) { await setFullUserCachesWithTrainerList(all, undefined); }
+    async function setFullUserCachesWithTrainerList(allUsers, trainerDtos) {
+      _allUsersResolved = allUsers;
+      allUsers.forEach(u => { if (u && u.id != null) bumpMaxSeenUserId(u.id); });
+      const trainerIdSet = await buildTrainerIdSet(trainerDtos);
+      _users = filterOutTrainers(allUsers, trainerIdSet);
+    }
+
+    async function fetchAllSchedules() {
+      const raw = await api('/api/Trainer/AllSchedules');
+      const arr = Array.isArray(raw) ? raw : [];
+      return arr.map(normalizeSchedule);
+    }
+
+    function trainerNameById(trainerId) {
+      const id = Number(trainerId);
+      const t = _trainers.find(x => Number(x.id) === id);
+      if (t) return displayUserName(t);
+      const a = _allUsersResolved.find(x => Number(x.id) === id);
+      if (a) return displayUserName(a);
+      return trainerId != null ? ('#' + trainerId) : '—';
+    }
+
+    function dateToIsoDateTime(dateStr, endOfDay) {
+      if (!dateStr) return null;
+      const d = new Date(dateStr.includes('T') ? dateStr : dateStr + 'T00:00:00');
+      if (endOfDay) d.setHours(23, 59, 59, 999);
+      return d.toISOString();
+    }
+
+    // ─── DASHBOARD ────────────────────────────────────────────────────────────────
+    async function loadDashboard() {
+      const name = _currentUser ? ([_currentUser.firstName, _currentUser.lastName].filter(Boolean).join(' ') || _currentUser.username) : '';
+      if (name) document.getElementById('dash-welcome').textContent = `Welcome, ${name}`;
+
+      try {
+        const [usersR, membershipsR, classesR, schedulesR, trainersR, trainersRawR] = await Promise.allSettled([
+          fetchAllUsersResolved(),
+          api('/api/Membership/Active'),
+          api('/api/GymClass/GetAllGymClasses'),
+          fetchAllSchedules(),
+          fetchAllTrainersResolved(),
+          api('/api/Admin/GetAllTrainers').catch(() => []),
+        ]);
+
+        let uFull = settledVal(usersR, []) || [];
+        let m = (settledVal(membershipsR, []) || []).map(normalizeMembership);
+        let c = (settledVal(classesR, []) || []).map(normalizeClass);
+        let s = settledVal(schedulesR, []) || [];
+        let tr = settledVal(trainersR, []) || [];
+        const trainersRaw = settledVal(trainersRawR, []) || [];
+
+        // ROLE-BASED FILTERS: Show appropriate content based on user role
+        if (getRole() === ROLE_ADMIN) {
+          // Admin sees everything - no filtering needed
+        }
+        else if (getRole() === ROLE_TRAINER) {
+          // TRAINER FILTERS: Only show self schedules
+          s = s.filter(x => x.trainerId == _currentUser.id);
+          uFull = [];
+        }
+        else if (getRole() === ROLE_CUSTOMER) {
+          // CUSTOMER FILTERS: Only show self memberships and associated schedules
+          m = m.filter(x => x.userId == _currentUser.id);
+          // Filter schedules to only show those associated with this member
+          s = s.filter(x => isScheduleForMember(x, _currentUser.id));
+          const classIds = new Set(s.map(x => x.gymClassId));
+          c = c.filter(x => classIds.has(x.id));
+          uFull = []; // Customers don't see other users
+        }
+
+        await setFullUserCachesWithTrainerList(uFull, trainersRaw);
+        _memberships = m; _classes = c; _schedules = s; _trainers = tr;
+
+        document.getElementById('stat-users-card').style.display = isAdmin() ? '' : 'none';
+        document.getElementById('stat-memberships-label').textContent = isAdmin() ? 'Active Memberships' : 'My Membership';
+        
+        document.getElementById('stat-users').textContent = String(_users.length || 0);
+        const activeMemberships = m.filter(x => (x.status || '').toLowerCase() === 'active');
+        document.getElementById('stat-memberships').textContent = isAdmin() ? String(activeMemberships.length) : (m.length > 0 ? (m[0].status || 'Active') : 'None');
+        
+        // Calculate gym classes count based on user role
+        let classesCount = 0;
+        if (isAdmin()) {
+          classesCount = c.length || 0; // Admin sees all classes
+        } else if (isTrainer()) {
+          // Trainer sees classes they are scheduled to teach in next month
+          const nextMonth = new Date();
+          nextMonth.setMonth(nextMonth.getMonth() + 1);
+          const trainerSchedules = s.filter(x => x.trainerId == _currentUser.id && new Date(x.startTime) <= nextMonth);
+          const trainerClassIds = new Set(trainerSchedules.map(x => x.gymClassId));
+          classesCount = trainerClassIds.size;
+        } else {
+          classesCount = c.length || 0; // Customer sees their enrolled classes
+        }
+        
+        document.getElementById('stat-classes').textContent = String(classesCount);
+        document.getElementById('stat-schedules').textContent = String(s.length || 0);
+
+        const usersCard = document.getElementById('card-recent-users');
+        if (usersCard) usersCard.style.display = isAdmin() ? '' : 'none';
+
+        const tbody = document.getElementById('dash-users-table');
+        if (tbody) {
+          tbody.innerHTML = !_users.length
+            ? `<tr><td colspan="3"><div class="empty-state"><p>No users yet</p></div></td></tr>`
+            : _users.slice(0, 6).map(usr => {
+              const n = [usr.firstName, usr.lastName].filter(Boolean).join(' ') || usr.username || '—';
+              return `<tr><td><div class="user-cell"><div class="avatar">${initials(n)}</div><div class="user-name">${escapeHtml(n)}</div></div></td><td style="color:var(--text-light)">${escapeHtml(usr.username || '—')}</td><td style="color:var(--text-light);font-size:13px">${escapeHtml(usr.email || '—')}</td></tr>`;
+            }).join('');
+        }
+
+        const schedDiv = document.getElementById('dash-schedules');
+        
+        // Filter schedules: remove ones older than 1 week, sort newest first
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        
+        const upcomingSchedules = s.filter(sc => new Date(sc.startTime) >= oneWeekAgo)
+                                   .sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+        
+        schedDiv.innerHTML = !upcomingSchedules.length
+          ? `<div class="empty-state"><p>No upcoming schedules</p></div>`
+          : upcomingSchedules.slice(0, 5).map(sc => {
+            const cls = c.find(x => x.id === sc.gymClassId);
+            // For Customer, show Trainer. For Admin/Trainer, show regular view.
+            const trainerInfo = getRole() === ROLE_CUSTOMER ? `Trainer: ${escapeHtml(trainerNameById(sc.trainerId))}` : escapeHtml(trainerNameById(sc.trainerId));
+            return `<div class="schedule-item"><div class="schedule-time">${fmtDateTime(sc.startTime).split(',')[0] || '—'}</div><div><div class="schedule-class">${escapeHtml(cls ? cls.name : ('Class #' + sc.gymClassId))}</div><div class="schedule-trainer">${trainerInfo}</div></div><div class="schedule-spots">${sc.durationMinutes || sc.duration || '—'} min</div></div>`;
+          }).join('');
+      } catch (e) {
+        toast('Failed to load dashboard: ' + e.message, 'error');
+      }
+    }
+
+    // ─── USERS ────────────────────────────────────────────────────────────────────
+    async function loadUsers() {
+      const tbody = document.getElementById('users-table');
+      tbody.innerHTML = `<tr class="loading-row"><td colspan="6"><div class="spinner"></div></td></tr>`;
+      try {
+        const all = await fetchAllUsersResolved();
+        await setFullUserCaches(all);
+        renderUsers(_users);
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:30px">Error: ${escapeHtml(e.message)}</td></tr>`;
+        toast('Failed to load users', 'error');
+      }
+    }
+
+    function renderUsers(users) {
+      const tbody = document.getElementById('users-table');
+      if (!users.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="emoji">👥</div><h3>No users found</h3><p>Click "Add User" to get started</p></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = users.map((u, i) => {
+        const name = [u.firstName, u.lastName].filter(Boolean).join(' ') || u.username || '—';
+        const userRole = u.role || u.roleName || ROLE_CUSTOMER;
+        const adminActions = isAdmin()
+          ? `<button class="btn btn-outline btn-sm" onclick='openEditUser(${JSON.stringify(u)})'>Edit</button>
+         <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteUser(${u.id})">Delete</button>
+         <button class="btn btn-ghost btn-sm" style="margin-left:4px" title="Change Role" onclick="promptRoleChange(${u.id}, '${escapeHtml(name)}')"></button>`
+          : `<span style="color:var(--text-light);font-size:12px">View only</span>`;
+
+        return `<tr style="animation-delay:${i * 30}ms">
+      <td><div class="user-cell"><div class="avatar">${initials(name)}</div><div><div class="user-name">${escapeHtml(name)}</div></div></div></td>
+      <td style="color:var(--text-light);font-size:12px">${u.id != null ? u.id : '—'}</td>
+      <td style="color:var(--text-light)">${escapeHtml(u.username || '—')}</td>
+      <td style="color:var(--text-light);font-size:13px">${escapeHtml(u.email || '—')}</td>
+      <td>${roleBadge(userRole)}</td>
+      <td>${adminActions}</td>
+    </tr>`;
+      }).join('');
+    }
+
+    function filterUsers() {
+      const q = document.getElementById('users-search').value.toLowerCase();
+      renderUsers(_users.filter(u => [u.firstName, u.lastName, u.username, u.email].join(' ').toLowerCase().includes(q)));
+    }
+
+    function openEditUser(u) {
+      document.getElementById('eu-id').value = u.id;
+      document.getElementById('eu-firstname').value = u.firstName || '';
+      document.getElementById('eu-lastname').value = u.lastName || '';
+      document.getElementById('eu-username').value = u.username || '';
+      document.getElementById('eu-email').value = u.email || '';
+      openModal('modal-edit-user');
+    }
+
+    async function submitAddUser() {
+      const body = {
+        firstName: document.getElementById('u-firstname').value.trim(),
+        lastName: document.getElementById('u-lastname').value.trim(),
+        username: document.getElementById('u-username').value.trim(),
+        email: document.getElementById('u-email').value.trim(),
+        password: document.getElementById('u-password').value,
+        phone: document.getElementById('u-phone').value.trim(),
+        address: document.getElementById('u-address').value.trim(),
+      };
+      if (!body.username || !body.password) { toast('Username and password are required', 'error'); return; }
+      if (!body.email) { toast('Email is required', 'error'); return; }
+      if (!body.firstName || !body.lastName) { toast('First and last name are required', 'error'); return; }
+      try {
+        const created = await api('/api/Admin/AddUser', 'POST', body);
+        const newId = created && (created.userId ?? created.id);
+        if (newId != null) rememberUserId(newId);
+        toast('User created successfully! Default role: Customer.', 'success');
+        closeModal('modal-add-user');
+        loadUsers();
+      } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    async function submitEditUser() {
+      if (!requireRole(ROLE_ADMIN)) return;
+      const id = document.getElementById('eu-id').value;
+      const body = {
+        firstName: document.getElementById('eu-firstname').value.trim() || null,
+        lastName: document.getElementById('eu-lastname').value.trim() || null,
+        username: document.getElementById('eu-username').value.trim() || null,
+        email: document.getElementById('eu-email').value.trim() || null,
+      };
+      try {
+        await api('/api/Admin/UpdateUser/' + id, 'PUT', body);
+        toast('User updated!', 'success');
+        closeModal('modal-edit-user');
+        loadUsers();
+      } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    function deleteUser(id) {
+      if (!requireRole(ROLE_ADMIN)) return;
+      confirmDialog('Delete User?', 'This will permanently remove the user and all related data.', async () => {
+        try {
+          await api('/api/Admin/RemoveUser/' + id, 'DELETE');
+          forgetUserId(id);
+          toast('User deleted', 'success');
+          loadUsers();
+        } catch (e) { toast('Error: ' + e.message, 'error'); }
+      });
+    }
+
+    // Role change from Users table (Admin only)
+    function promptRoleChange(userId, userName) {
+      if (!requireRole(ROLE_ADMIN)) return;
+      // Populate the roles assign panel and switch to Roles page
+      navigate('roles', document.querySelector('[onclick*="navigate(\'roles\'"]'));
+      setTimeout(() => {
+        const sel = document.getElementById('assign-userid');
+        if (sel) sel.value = userId;
+      }, 500);
+    }
+
+    // ─── MEMBERSHIPS ──────────────────────────────────────────────────────────────
+    async function loadMemberships() {
+      const tbody = document.getElementById('memberships-table');
+      tbody.innerHTML = `<tr class="loading-row"><td colspan="7"><div class="spinner"></div></td></tr>`;
+      try {
+        const raw = await api('/api/Membership/Active') || [];
+        const all = await fetchAllUsersResolved();
+        await setFullUserCaches(all);
+        _memberships = raw.map(normalizeMembership);
+        renderMemberships(_memberships);
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--danger);padding:30px">Error: ${escapeHtml(e.message)}</td></tr>`;
+        toast('Failed to load memberships', 'error');
+      }
+    }
+
+    function renderMemberships(list) {
+      const tbody = document.getElementById('memberships-table');
+      if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="emoji">💳</div><h3>No memberships</h3><p>Register a new membership to get started</p></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = list.map((m, i) => {
+        const uid = m.userId ?? m.user_id;
+        const mu = _allUsersResolved.find(x => Number(x.id) === Number(uid));
+        const memberLabel = mu ? escapeHtml(displayUserName(mu)) : (uid != null ? ('User #' + uid) : '—');
+        const adminActions = isAdmin()
+          ? `<button class="btn btn-outline btn-sm" onclick='openEditMembership(${JSON.stringify(m)})'>Edit</button>
+         <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteMembership(${m.id})">Delete</button>`
+          : `<span style="color:var(--text-light);font-size:12px">—</span>`;
+        return `<tr style="animation-delay:${i * 30}ms">
+      <td style="color:var(--text-light);font-size:12px">#${m.id}</td>
+      <td>${memberLabel}</td>
+      <td><strong>${escapeHtml(m.membershipType || m.type || '—')}</strong></td>
+      <td>${fmtDate(m.startDate)}</td>
+      <td>${fmtDate(m.endDate)}</td>
+      <td>${membershipBadge(m.status)}</td>
+      <td>${adminActions}</td>
+    </tr>`;
+      }).join('');
+    }
+
+    function filterMemberships() {
+      const q = document.getElementById('memberships-search').value.toLowerCase();
+      renderMemberships(_memberships.filter(m => {
+        const uid = m.userId ?? m.user_id;
+        const mu = _allUsersResolved.find(x => Number(x.id) === Number(uid));
+        const ns = mu ? displayUserName(mu) : '';
+        return [(m.membershipType || m.type || ''), (m.status || ''), ns, String(uid || '')].join(' ').toLowerCase().includes(q);
+      }));
+    }
+
+    async function openEditMembership(m) {
+      document.getElementById('em-id').value = m.id;
+      document.getElementById('em-userid').value = m.userId || '';
+      document.getElementById('em-type').value = m.membershipTypeId || '';
+      document.getElementById('em-price').value = m.price || '';
+      document.getElementById('em-startdate').value = (m.startDate || '').substring(0, 10);
+      document.getElementById('em-enddate').value = (m.endDate || '').substring(0, 10);
+
+      // Load and render trainers checkboxes
+      const trainersContainer = document.getElementById('em-trainers-container');
+      const classesContainer = document.getElementById('em-classes-container');
+      const scheduleSection = document.getElementById('em-schedule-section');
+
+      // Reset containers
+      trainersContainer.innerHTML = '<p style="color: var(--text-light); font-size: 13px; margin: 0;">Loading trainers...</p>';
+      classesContainer.innerHTML = '<p style="color: var(--text-light); font-size: 13px; margin: 0;">Loading classes...</p>';
+      scheduleSection.style.display = 'none';
+
+      const userId = m.userId;
+
+      // Load trainers
+      try {
+        _trainers = await fetchAllTrainersResolved();
+        if (_trainers.length === 0) {
+          trainersContainer.innerHTML = '<p style="color: var(--text-light); font-size: 13px; margin: 0;">No trainers available</p>';
+        } else {
+          // Get existing member classes to pre-select trainers
+          const memberClasses = getMemberClasses(userId);
+          const assignedTrainerIds = new Set(memberClasses.map(mc => mc.trainerId));
+
+          trainersContainer.innerHTML = _trainers.map(t => {
+            const name = displayUserName(t);
+            const isChecked = assignedTrainerIds.has(t.id) ? 'checked' : '';
+            return `<label style="display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer; font-size: 13px;">
+              <input type="checkbox" name="em-trainer" value="${t.id}" style="width: 16px; height: 16px; cursor: pointer;" ${isChecked}>
+              <span>${escapeHtml(name)}</span>
+            </label>`;
+          }).join('');
+        }
+      } catch (e) {
+        trainersContainer.innerHTML = '<p style="color: var(--danger); font-size: 13px; margin: 0;">Failed to load trainers</p>';
+      }
+
+      // Load classes
+      try {
+        const raw = await api('/api/GymClass/GetAllGymClasses') || [];
+        _classes = raw.map(normalizeClass);
+        if (_classes.length === 0) {
+          classesContainer.innerHTML = '<p style="color: var(--text-light); font-size: 13px; margin: 0;">No classes available</p>';
+        } else {
+          // Get existing member classes to pre-select
+          const memberClasses = getMemberClasses(userId);
+          const assignedClassIds = new Set(memberClasses.map(mc => mc.classId));
+
+          classesContainer.innerHTML = _classes.map(c => {
+            const isChecked = assignedClassIds.has(c.id) ? 'checked' : '';
+            return `<label style="display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer; font-size: 13px;">
+              <input type="checkbox" name="em-class" value="${c.id}" style="width: 16px; height: 16px; cursor: pointer;" onchange="toggleEditScheduleSection()" ${isChecked}>
+              <span>${escapeHtml(c.name)}</span>
+            </label>`;
+          }).join('');
+
+          // Show schedule section if classes are already selected
+          if (assignedClassIds.size > 0) {
+            scheduleSection.style.display = 'block';
+          }
+        }
+      } catch (e) {
+        classesContainer.innerHTML = '<p style="color: var(--danger); font-size: 13px; margin: 0;">Failed to load classes</p>';
+      }
+
+      // Set default schedule time
+      const scheduleTime = document.getElementById('em-schedule-time');
+      if (scheduleTime && !scheduleTime.value) {
+        const now = new Date();
+        now.setMinutes(0, 0, 0);
+        now.setHours(now.getHours() + 1);
+        scheduleTime.value = now.toISOString().slice(0, 16);
+      }
+
+      openModal('modal-edit-membership');
+    }
+
+    function toggleEditScheduleSection() {
+      const checkboxes = document.querySelectorAll('input[name="em-class"]:checked');
+      const scheduleSection = document.getElementById('em-schedule-section');
+      scheduleSection.style.display = checkboxes.length > 0 ? 'block' : 'none';
+    }
+
+    async function submitEditMembership() {
+      if (!requireRole(ROLE_ADMIN)) return;
+      const id = document.getElementById('em-id').value;
+      const userId = parseInt(document.getElementById('em-userid').value, 10);
+      const body = {
+        membershipTypeId: parseInt(document.getElementById('em-type').value, 10),
+        price: parseFloat(document.getElementById('em-price').value),
+        startDate: dateToIsoDateTime(document.getElementById('em-startdate').value, false),
+        endDate: dateToIsoDateTime(document.getElementById('em-enddate').value, true),
+      };
+
+      // Get selected trainers and classes
+      const selectedTrainers = Array.from(document.querySelectorAll('input[name="em-trainer"]:checked')).map(cb => parseInt(cb.value, 10));
+      const selectedClasses = Array.from(document.querySelectorAll('input[name="em-class"]:checked')).map(cb => parseInt(cb.value, 10));
+      const scheduleTime = document.getElementById('em-schedule-time').value;
+      const duration = parseInt(document.getElementById('em-duration').value, 10) || 60;
+
+      // If NEW classes are selected, schedule time is required
+      const existingClasses = getMemberClasses(userId);
+      const existingClassIds = new Set(existingClasses.map(mc => mc.classId));
+      const newClasses = selectedClasses.filter(cid => !existingClassIds.has(cid));
+
+      if (newClasses.length > 0 && !scheduleTime) {
+        toast('Please set a schedule start time for the new classes', 'error');
+        return;
+      }
+
+      try {
+        // First, update the membership
+        await api('/api/Membership/Update/' + id, 'PUT', body);
+        toast('Membership updated!', 'success');
+
+        // Then, create schedules for any NEW selected classes
+        if (newClasses.length > 0) {
+          const schedulePromises = [];
+          const startDateTime = new Date(scheduleTime);
+
+          for (let i = 0; i < newClasses.length; i++) {
+            const classId = newClasses[i];
+            // Stagger schedules by 1 hour for each class
+            const scheduledDateTime = new Date(startDateTime.getTime() + i * 60 * 60 * 1000);
+
+            // Use first selected trainer as the trainer for all classes, or fall back to any available trainer
+            let trainerId = selectedTrainers.length > 0 ? selectedTrainers[0] : null;
+
+            // If no trainer selected, try to find one from the trainers list
+            if (!trainerId && _trainers.length > 0) {
+              trainerId = _trainers[0].id;
+            }
+
+            if (trainerId) {
+              schedulePromises.push(
+                api('/api/Trainer/AssignSchedule', 'POST', {
+                  userId: trainerId,
+                  gymClassId: classId,
+                  scheduledDateTime: scheduledDateTime.toISOString(),
+                  duration: duration
+                }).then(result => {
+                  // Store the member-class association locally
+                  storeMemberClassAssociation(userId, classId, trainerId, scheduledDateTime.toISOString(), duration);
+                  return result;
+                }).catch(e => {
+                  return null;
+                })
+              );
+            }
+          }
+
+          if (schedulePromises.length > 0) {
+            const results = await Promise.all(schedulePromises);
+            const successCount = results.filter(r => r !== null).length;
+            if (successCount > 0) {
+              toast(`${successCount} new class(es) scheduled successfully!`, 'success');
+            }
+          }
+        }
+
+        closeModal('modal-edit-membership');
+        loadMemberships();
+
+        // Also refresh the dashboard if we're on it
+        if (currentPage === 'dashboard') {
+          loadDashboard();
+        }
+      } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    function deleteMembership(id) {
+      if (!requireRole(ROLE_ADMIN)) return;
+      confirmDialog('Delete Membership?', 'This membership will be permanently removed.', async () => {
+        try {
+          await api('/api/Membership/Delete/' + id, 'DELETE');
+          toast('Membership deleted', 'success');
+          loadMemberships();
+        } catch (e) { toast('Error: ' + e.message, 'error'); }
+      });
+    }
+
+    async function openAddMembershipModal() {
+      if (!requireRole(ROLE_ADMIN)) return;
+      const all = await fetchAllUsersResolved();
+      await setFullUserCaches(all);
+      const sel = document.getElementById('m-userid');
+      sel.innerHTML = '<option value="">Select member…</option>' +
+        _users.map(u => `<option value="${u.id}">${escapeHtml(displayUserName(u))}</option>`).join('');
+      const sd = document.getElementById('m-startdate');
+      const ed = document.getElementById('m-enddate');
+      if (sd && !sd.value) sd.value = new Date().toISOString().slice(0, 10);
+      if (ed && !ed.value) { const t = new Date(); t.setMonth(t.getMonth() + 1); ed.value = t.toISOString().slice(0, 10); }
+
+      // Load and render trainers checkboxes
+      const trainersContainer = document.getElementById('m-trainers-container');
+      const classesContainer = document.getElementById('m-classes-container');
+      const scheduleSection = document.getElementById('m-schedule-section');
+
+      // Reset containers
+      trainersContainer.innerHTML = '<p style="color: var(--text-light); font-size: 13px; margin: 0;">Loading trainers...</p>';
+      classesContainer.innerHTML = '<p style="color: var(--text-light); font-size: 13px; margin: 0;">Loading classes...</p>';
+      scheduleSection.style.display = 'none';
+
+      // Load trainers
+      try {
+        _trainers = await fetchAllTrainersResolved();
+        if (_trainers.length === 0) {
+          trainersContainer.innerHTML = '<p style="color: var(--text-light); font-size: 13px; margin: 0;">No trainers available</p>';
+        } else {
+          trainersContainer.innerHTML = _trainers.map(t => {
+            const name = displayUserName(t);
+            return `<label style="display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer; font-size: 13px;">
+              <input type="checkbox" name="m-trainer" value="${t.id}" style="width: 16px; height: 16px; cursor: pointer;">
+              <span>${escapeHtml(name)}</span>
+            </label>`;
+          }).join('');
+        }
+      } catch (e) {
+        trainersContainer.innerHTML = '<p style="color: var(--danger); font-size: 13px; margin: 0;">Failed to load trainers</p>';
+      }
+
+      // Load classes
+      try {
+        const raw = await api('/api/GymClass/GetAllGymClasses') || [];
+        _classes = raw.map(normalizeClass);
+        if (_classes.length === 0) {
+          classesContainer.innerHTML = '<p style="color: var(--text-light); font-size: 13px; margin: 0;">No classes available</p>';
+        } else {
+          classesContainer.innerHTML = _classes.map(c => {
+            return `<label style="display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer; font-size: 13px;">
+              <input type="checkbox" name="m-class" value="${c.id}" style="width: 16px; height: 16px; cursor: pointer;" onchange="toggleScheduleSection()">
+              <span>${escapeHtml(c.name)}</span>
+            </label>`;
+          }).join('');
+        }
+      } catch (e) {
+        classesContainer.innerHTML = '<p style="color: var(--danger); font-size: 13px; margin: 0;">Failed to load classes</p>';
+      }
+
+      // Set default schedule time
+      const scheduleTime = document.getElementById('m-schedule-time');
+      if (scheduleTime && !scheduleTime.value) {
+        const now = new Date();
+        now.setMinutes(0, 0, 0);
+        now.setHours(now.getHours() + 1);
+        scheduleTime.value = now.toISOString().slice(0, 16);
+      }
+
+      openModal('modal-add-membership');
+    }
+
+    function toggleScheduleSection() {
+      const checkboxes = document.querySelectorAll('input[name="m-class"]:checked');
+      const scheduleSection = document.getElementById('m-schedule-section');
+      scheduleSection.style.display = checkboxes.length > 0 ? 'block' : 'none';
+    }
+
+    async function submitAddMembership() {
+      const userId = parseInt(document.getElementById('m-userid').value, 10);
+      const membershipTypeId = parseInt(document.getElementById('m-type').value, 10);
+      const price = parseFloat(document.getElementById('m-price').value);
+      const start = document.getElementById('m-startdate').value;
+      const end = document.getElementById('m-enddate').value;
+      if (!userId) { toast('Please select a member', 'error'); return; }
+      if (!membershipTypeId) { toast('Membership type is required', 'error'); return; }
+      if (!(price >= 0.01)) { toast('Price must be at least 0.01', 'error'); return; }
+
+      // Get selected trainers and classes
+      const selectedTrainers = Array.from(document.querySelectorAll('input[name="m-trainer"]:checked')).map(cb => parseInt(cb.value, 10));
+      const selectedClasses = Array.from(document.querySelectorAll('input[name="m-class"]:checked')).map(cb => parseInt(cb.value, 10));
+      const scheduleTime = document.getElementById('m-schedule-time').value;
+      const duration = parseInt(document.getElementById('m-duration').value, 10) || 60;
+
+      // If classes are selected, schedule time is required
+      if (selectedClasses.length > 0 && !scheduleTime) {
+        toast('Please set a schedule start time for the classes', 'error');
+        return;
+      }
+
+      const body = { userId, membershipTypeId, startDate: dateToIsoDateTime(start, false), endDate: dateToIsoDateTime(end, true), price };
+
+      try {
+        // First, register the membership
+        await api('/api/Membership/Register', 'POST', body);
+        toast('Membership registered!', 'success');
+
+        // Then, create schedules for each selected class
+        if (selectedClasses.length > 0) {
+          const schedulePromises = [];
+          const startDateTime = new Date(scheduleTime);
+
+          for (let i = 0; i < selectedClasses.length; i++) {
+            const classId = selectedClasses[i];
+            // Stagger schedules by 1 hour for each class
+            const scheduledDateTime = new Date(startDateTime.getTime() + i * 60 * 60 * 1000);
+
+            // Use first selected trainer as the trainer for all classes, or fall back to any available trainer
+            let trainerId = selectedTrainers.length > 0 ? selectedTrainers[0] : null;
+
+            // If no trainer selected, try to find one from the trainers list
+            if (!trainerId && _trainers.length > 0) {
+              trainerId = _trainers[0].id;
+            }
+
+            if (trainerId) {
+              schedulePromises.push(
+                api('/api/Trainer/AssignSchedule', 'POST', {
+                  userId: trainerId,
+                  gymClassId: classId,
+                  scheduledDateTime: scheduledDateTime.toISOString(),
+                  duration: duration
+                }).then(result => {
+                  // Store the member-class association locally
+                  storeMemberClassAssociation(userId, classId, trainerId, scheduledDateTime.toISOString(), duration);
+                  return result;
+                }).catch(e => {
+                  return null;
+                })
+              );
+            }
+          }
+
+          if (schedulePromises.length > 0) {
+            const results = await Promise.all(schedulePromises);
+            const successCount = results.filter(r => r !== null).length;
+            if (successCount > 0) {
+              toast(`${successCount} class(es) scheduled successfully!`, 'success');
+            }
+          }
+        }
+
+        closeModal('modal-add-membership');
+        loadMemberships();
+
+        // Also refresh the dashboard if we're on it
+        if (currentPage === 'dashboard') {
+          loadDashboard();
+        }
+      } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    // ─── GYM CLASSES ─────────────────────────────────────────────────────────────
+    async function loadClasses() {
+      const tbody = document.getElementById('classes-table');
+      tbody.innerHTML = `<tr class="loading-row"><td colspan="4"><div class="spinner"></div></td></tr>`;
+      try {
+        const raw = await api('/api/GymClass/GetAllGymClasses') || [];
+        _classes = raw.map(normalizeClass);
+        renderClasses(_classes);
+        // Update class select in schedule modal
+        const sel = document.getElementById('s-classid');
+        if (sel) sel.innerHTML = '<option value="">Select class...</option>' + _classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--danger);padding:30px">Error: ${escapeHtml(e.message)}</td></tr>`;
+        toast('Failed to load classes', 'error');
+      }
+    }
+
+    function renderClasses(list) {
+      const tbody = document.getElementById('classes-table');
+      if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="emoji">🏋️</div><h3>No classes yet</h3><p>Add your first gym class</p></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = list.map((c, i) => {
+        const cap = c.capacity ? `<span class="badge badge-info">${c.capacity} Min</span>` : '<span style="color:var(--text-light)">—</span>';
+        const adminActions = isAdmin()
+          ? `<button class="btn btn-outline btn-sm" onclick='openEditClass(${JSON.stringify(c)})'>Edit</button>
+         <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteClass(${c.id})">Delete</button>`
+          : isTrainer()
+            ? `<button class="btn btn-outline btn-sm" onclick='openEditClass(${JSON.stringify(c)})'>Edit</button>`
+            : '<span style="color:var(--text-light);font-size:12px">View only</span>';
+        return `<tr style="animation-delay:${i * 30}ms">
+      <td><strong>${escapeHtml(c.name || '—')}</strong></td>
+      <td style="color:var(--text-light);font-size:13px">${escapeHtml(c.description || '—')}</td>
+      <td>${cap}</td>
+      <td>${adminActions}</td>
+    </tr>`;
+      }).join('');
+    }
+
+    function filterClasses() {
+      const q = document.getElementById('classes-search').value.toLowerCase();
+      renderClasses(_classes.filter(c => (c.name || '').toLowerCase().includes(q) || (c.description || '').toLowerCase().includes(q)));
+    }
+
+    async function submitAddClass() {
+      if (!isAdmin() && !isTrainer()) { toast('Requires Trainer or Admin role', 'error'); return; }
+      const gymClassName = document.getElementById('c-name').value.trim();
+      if (!gymClassName) { toast('Class name is required', 'error'); return; }
+      const capacity = parseInt(document.getElementById('c-capacity').value, 10) || null;
+      try {
+        await api('/api/GymClass/AddGymClass', 'POST', { gymClassName, capacity });
+        toast('Class created!', 'success');
+        closeModal('modal-add-class');
+        loadClasses();
+      } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    function openEditClass(c) {
+      document.getElementById('ec-id').value = c.id;
+      document.getElementById('ec-name').value = c.name || c.gymClassName || '';
+      document.getElementById('ec-description').value = c.description || '';
+      document.getElementById('ec-capacity').value = c.capacity || '';
+      openModal('modal-edit-class');
+    }
+
+    async function submitEditClass() {
+      if (!isAdmin() && !isTrainer()) { toast('Requires Trainer or Admin role', 'error'); return; }
+      const id = document.getElementById('ec-id').value;
+      const gymClassName = document.getElementById('ec-name').value.trim();
+      if (!gymClassName) { toast('Class name is required', 'error'); return; }
+      const capacity = parseInt(document.getElementById('ec-capacity').value, 10) || null;
+      try {
+        await api('/api/GymClass/UpdateGymClass/' + id, 'PUT', { gymClassName, capacity });
+        toast('Class updated!', 'success');
+        closeModal('modal-edit-class');
+        loadClasses();
+      } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    function deleteClass(id) {
+      if (!requireRole(ROLE_ADMIN)) return;
+      confirmDialog('Delete Class?', 'All schedules for this class will also be affected.', async () => {
+        try {
+          await api('/api/GymClass/DeleteGymClass/' + id, 'DELETE');
+          toast('Class deleted', 'success');
+          loadClasses();
+        } catch (e) { toast('Error: ' + e.message, 'error'); }
+      });
+    }
+
+    // ─── SCHEDULES ────────────────────────────────────────────────────────────────
+    let _currentWeekOffset = 0;
+
+    async function loadSchedules() {
+      const tbody = document.getElementById('schedules-table');
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="5"><div class="spinner"></div></td></tr>';
+      try {
+        const classesRaw = await api('/api/GymClass/GetAllGymClasses').catch(() => []);
+        _classes = (classesRaw || []).map(normalizeClass);
+        const sel = document.getElementById('s-classid');
+        if (sel) sel.innerHTML = '<option value="">Select class...</option>' + _classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+        if (!_allUsersResolved.length) { const all = await fetchAllUsersResolved(); await setFullUserCaches(all); }
+        _trainers = await fetchAllTrainersResolved();
+        _schedules = await fetchAllSchedules();
+        
+        renderSchedulesTable();
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--danger);padding:30px">Error: ${escapeHtml(e.message)}</td></tr>`;
+        toast('Failed to load schedules', 'error');
+      }
+    }
+
+    // ─── NEW WEEKLY CALENDAR RENDERER ────────────────────────────────────────────
+    const CAL_START_H = 8;   // 08:00
+    const CAL_END_H   = 23;  // 23:00
+    const CAL_SLOT_PX = 52;  // px per 30-min slot (matches .cal-cell height)
+    const CAL_COLORS  = ['cal-c-1','cal-c-2','cal-c-3','cal-c-4','cal-c-5','cal-c-6'];
+    const DAY_ABBR    = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+    function pad2(n) { return String(n).padStart(2,'0'); }
+    function fmtT(h,m) { return `${pad2(h)}:${pad2(m)}`; }
+    function addMin(h,m,dur) { const t=h*60+m+dur; return {h:Math.floor(t/60),m:t%60}; }
+
+    function getMonWeekStart(offset) {
+      const now = new Date();
+      const dow = now.getDay(); // 0=Sun
+      const diff = dow === 0 ? -6 : 1 - dow;
+      const mon = new Date(now);
+      mon.setDate(now.getDate() + diff + offset * 7);
+      mon.setHours(0,0,0,0);
+      return mon;
+    }
+
+    function renderWeeklyCalendar() {
+      const grid  = document.getElementById('calendar-grid');
+      const title = document.getElementById('calendar-title');
+      const legend = document.getElementById('cal-legend');
+
+      const weekStart = getMonWeekStart(_currentWeekOffset);
+      const weekEnd   = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      weekEnd.setHours(23,59,59,999);
+
+      // Title
+      const fmt = d => d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+      title.textContent = `${fmt(weekStart)} — ${fmt(weekEnd)}`;
+
+      // Today index (0=Mon … 6=Sun, or -1 if outside week)
+      const todayDate = new Date(); todayDate.setHours(0,0,0,0);
+      const todayOffset = Math.round((todayDate - weekStart) / 86400000);
+      const todayIdx = (todayOffset >= 0 && todayOffset <= 6) ? todayOffset : -1;
+
+      // Filter schedules
+      let filtered = _schedules.filter(s => {
+        const d = new Date(s.startTime);
+        if (d < weekStart || d > weekEnd) return false;
+        if (getRole() === ROLE_TRAINER) return s.trainerId == _currentUser.id;
+        if (getRole() === ROLE_CUSTOMER) return isScheduleForMember(s, _currentUser.id);
+        return true; // admin
+      });
+
+      // Build colour map by gymClassId
+      const classColorMap = {};
+      let colorIdx = 0;
+      filtered.forEach(s => {
+        if (!(s.gymClassId in classColorMap)) {
+          classColorMap[s.gymClassId] = CAL_COLORS[colorIdx % CAL_COLORS.length];
+          colorIdx++;
+        }
+      });
+
+      // Legend
+      const legendClasses = [...new Set(filtered.map(s => s.gymClassId))];
+      const legendColorMap = {'cal-c-1':'#FF5722','cal-c-2':'#2196F3','cal-c-3':'#10B981','cal-c-4':'#9C27B0','cal-c-5':'#FF9800','cal-c-6':'#E91E8C'};
+      legend.innerHTML = legendClasses.map(cid => {
+        const cls = _classes.find(c => c.id === cid);
+        const col = classColorMap[cid];
+        return `<div class="cal-legend-item"><div class="cal-legend-dot" style="background:${legendColorMap[col]||'#999'}"></div>${escapeHtml(cls ? cls.name : 'Class')}</div>`;
+      }).join('');
+
+      // ── Build grid HTML ──────────────────────────────────────────────────
+      const TOTAL_SLOTS = (CAL_END_H - CAL_START_H) * 2; // 30-min slots
+      let html = '';
+
+      // Column headers
+      html += `<div class="cal-day-header cal-time-col-hdr"></div>`;
+      for (let d = 0; d < 7; d++) {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + d);
+        const isToday = d === todayIdx;
+        html += `<div class="cal-day-header${isToday?' cal-today':''}">
+          <div class="cal-dname">${DAY_ABBR[d]}</div>
+          <div class="cal-dnum">${date.getDate()}</div>
+        </div>`;
+      }
+
+      // Time slots
+      for (let slot = 0; slot < TOTAL_SLOTS; slot++) {
+        const totalMin = CAL_START_H * 60 + slot * 30;
+        const h = Math.floor(totalMin / 60);
+        const m = totalMin % 60;
+        const isHalf = m === 30;
+
+        // Time label cell
+        html += `<div class="cal-time-cell">${!isHalf ? `<span class="cal-time-label">${fmtT(h,m)}</span>` : ''}</div>`;
+
+        // 7 day cells
+        for (let d = 0; d < 7; d++) {
+          const isToday = d === todayIdx;
+          html += `<div class="cal-cell${isToday?' cal-cell-today':''}${isHalf?' cal-half':''}" data-slot="${slot}" data-day="${d}">`;
+
+          // Blocks that start in this exact slot
+          filtered.forEach(s => {
+            const sd = new Date(s.startTime);
+            // day-of-week relative to week start (Mon=0)
+            const sdDow = sd.getDay(); // 0=Sun
+            const sdIdx = sdDow === 0 ? 6 : sdDow - 1;
+            if (sdIdx !== d) return;
+
+            const sMin = sd.getHours() * 60 + sd.getMinutes();
+            const slotStartMin = CAL_START_H * 60 + slot * 30;
+            if (sMin !== slotStartMin) return;
+
+            const dur = s.durationMinutes || s.duration || 60;
+            const et  = addMin(sd.getHours(), sd.getMinutes(), dur);
+            const blockH = Math.max((dur / 30) * CAL_SLOT_PX - 5, 22);
+            const colorCls = classColorMap[s.gymClassId] || 'cal-c-1';
+            const cls = _classes.find(c => c.id === s.gymClassId);
+            const trainer = _trainers.find(t => t.id === s.trainerId);
+            const clsName = cls ? cls.name : 'Class';
+            const trainerName = trainer ? displayUserName(trainer) : 'Unknown Trainer';
+
+            const canEdit   = getRole() === ROLE_ADMIN || getRole() === ROLE_TRAINER;
+            const canDelete = getRole() === ROLE_ADMIN;
+
+            const actionsHtml = canEdit ? `<div class="cal-b-actions">
+              <button onclick="event.stopPropagation();openEditScheduleModal(${s.id})" title="Edit">✏️</button>
+              ${canDelete ? `<button onclick="event.stopPropagation();deleteSchedule(${s.id})" title="Delete">🗑️</button>` : ''}
+            </div>` : '';
+
+            html += `<div class="cal-block ${colorCls}"
+              style="height:${blockH}px;top:2px;"
+              onmouseenter="calShowTip(event,'${escapeHtml(clsName)}','${escapeHtml(trainerName)}','${fmtT(sd.getHours(),sd.getMinutes())}','${fmtT(et.h,et.m)}',${dur})"
+              onmousemove="calMoveTip(event)"
+              onmouseleave="calHideTip()">
+              <div class="cal-b-time">${fmtT(sd.getHours(),sd.getMinutes())} – ${fmtT(et.h,et.m)}</div>
+              <div class="cal-b-name">${escapeHtml(clsName)}</div>
+              <div class="cal-b-train">&#9679; ${escapeHtml(trainerName)}</div>
+              ${blockH > 58 ? `<div class="cal-b-dur">${dur} min</div>` : ''}
+              ${actionsHtml}
+            </div>`;
+          });
+
+          html += `</div>`;
+        }
+      }
+
+      grid.innerHTML = html;
+
+      // Now-line (current week only)
+      if (todayIdx >= 0) {
+        const now = new Date();
+        const nowMin = now.getHours() * 60 + now.getMinutes();
+        if (nowMin >= CAL_START_H * 60 && nowMin < CAL_END_H * 60) {
+          const offsetPx = ((nowMin - CAL_START_H * 60) / 30) * CAL_SLOT_PX;
+          const slotIdx  = Math.floor((nowMin - CAL_START_H * 60) / 30);
+          const partial  = ((nowMin - CAL_START_H * 60) % 30) / 30 * CAL_SLOT_PX;
+          const allCells = grid.querySelectorAll('.cal-cell');
+          const cellIdx  = slotIdx * 7 + todayIdx;
+          if (allCells[cellIdx]) {
+            const line = document.createElement('div');
+            line.className = 'cal-now-line';
+            line.style.top = partial + 'px';
+            const dot = document.createElement('div');
+            dot.className = 'cal-now-dot';
+            line.appendChild(dot);
+            allCells[cellIdx].appendChild(line);
+          }
+        }
+      }
+
+      if (filtered.length === 0 && _schedules.length > 0) {
+      }
+    }
+
+    // ─── SCHEDULES TABLE RENDERER ───────────────────────────────────────────────
+    function renderSchedulesTable() {
+      const tbody = document.getElementById('schedules-table');
+      if (!tbody) return;
+
+      // Get filter values
+      const trainerFilter = document.getElementById('schedules-search-trainer')?.value.toLowerCase() || '';
+      const trainerIdFilter = document.getElementById('schedules-search-trainer-id')?.value || '';
+      const classFilter = document.getElementById('schedules-search-class')?.value.toLowerCase() || '';
+      const dateFilter = document.getElementById('schedules-search-date')?.value || '';
+
+      // Sort schedules by scheduledDateTime (startTime) - newest first
+      let sortedSchedules = [..._schedules].sort((a, b) => {
+        const dateA = new Date(a.startTime);
+        const dateB = new Date(b.startTime);
+        return dateB - dateA; // descending: newest first
+      });
+
+      // Apply filters
+      sortedSchedules = sortedSchedules.filter(s => {
+        // Role-based filtering for customers
+        if (getRole() === ROLE_CUSTOMER && !isScheduleForMember(s, _currentUser.id)) {
+          return false;
+        }
+
+        const cls = _classes.find(c => c.id === s.gymClassId);
+        const trainer = _trainers.find(t => t.id === s.trainerId);
+        const clsName = cls ? cls.name : 'Class #' + s.gymClassId;
+        const trainerName = trainer ? displayUserName(trainer) : (s.trainerId ? 'Trainer #' + s.trainerId : '');
+        const startDate = new Date(s.startTime);
+        const dateStr = startDate.toISOString().slice(0, 10);
+
+        const matchesTrainer = trainerName.toLowerCase().includes(trainerFilter);
+        const matchesTrainerId = !trainerIdFilter || String(s.trainerId) === trainerIdFilter;
+        const matchesClass = clsName.toLowerCase().includes(classFilter);
+        const matchesDate = !dateFilter || dateStr === dateFilter;
+
+        return matchesTrainer && matchesTrainerId && matchesClass && matchesDate;
+      });
+
+      if (!sortedSchedules.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="emoji">📅</div><h3>No schedules found</h3><p>Try adjusting your filters</p></div></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = sortedSchedules.map((s, i) => {
+        const cls = _classes.find(c => c.id === s.gymClassId);
+        const trainer = _trainers.find(t => t.id === s.trainerId);
+        const clsName = cls ? cls.name : 'Class #' + s.gymClassId;
+        const trainerName = trainer ? displayUserName(trainer) : (s.trainerId ? 'Trainer #' + s.trainerId : '—');
+        const trainerId = s.trainerId || '—';
+        const startDate = new Date(s.startTime);
+        const dateStr = startDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        const timeStr = startDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        const duration = s.durationMinutes || s.duration || '—';
+
+        const canEdit = getRole() === ROLE_ADMIN || getRole() === ROLE_TRAINER;
+        const canDelete = getRole() === ROLE_ADMIN;
+
+        const actions = canEdit
+          ? `<button class="btn btn-outline btn-sm" onclick="openEditScheduleModal(${s.id})">Edit</button>
+             ${canDelete ? `<button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteSchedule(${s.id})">Delete</button>` : ''}`
+          : '<span style="color:var(--text-light);font-size:12px">View only</span>';
+
+        return `<tr style="animation-delay:${i * 30}ms">
+          <td><strong>${escapeHtml(dateStr)}</strong><br><span style="color:var(--text-light);font-size:12px">${escapeHtml(timeStr)}</span></td>
+          <td><strong>${escapeHtml(clsName)}</strong></td>
+          <td>${escapeHtml(trainerName)}</td>
+          <td style="color:var(--text-light);font-size:12px">${trainerId}</td>
+          <td><span class="badge badge-info">${duration} min</span></td>
+          <td>${actions}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function filterSchedulesTable() {
+      renderSchedulesTable();
+    }
+
+    function clearScheduleFilters() {
+      document.getElementById('schedules-search-trainer').value = '';
+      document.getElementById('schedules-search-trainer-id').value = '';
+      document.getElementById('schedules-search-class').value = '';
+      document.getElementById('schedules-search-date').value = '';
+      renderSchedulesTable();
+    }
+
+    // Tooltip helpers
+    function calShowTip(e, name, trainer, start, end, dur) {
+      const t = document.getElementById('cal-tooltip');
+      t.innerHTML = `<strong>${escapeHtml(name)}</strong>🕐 ${start} – ${end}<br>👤 ${escapeHtml(trainer)}<br>⏱ ${dur} min`;
+      t.classList.add('visible');
+      calMoveTip(e);
+    }
+    function calMoveTip(e) {
+      const t = document.getElementById('cal-tooltip');
+      t.style.left = (e.clientX + 14) + 'px';
+      t.style.top  = (e.clientY - 10) + 'px';
+    }
+    function calHideTip() {
+      document.getElementById('cal-tooltip').classList.remove('visible');
+    }
+
+    function getTrainerInitials(trainer) {
+      const first = trainer.firstName ? trainer.firstName.charAt(0).toUpperCase() : '';
+      const last = trainer.lastName ? trainer.lastName.charAt(0).toUpperCase() : '';
+      return (first + last) || (trainer.username ? trainer.username.substring(0, 2).toUpperCase() : '??');
+    }
+
+    function changeWeek(direction, resetToToday) {
+      if (resetToToday) { _currentWeekOffset = 0; }
+      else { _currentWeekOffset += direction; }
+      renderWeeklyCalendar();
+    }
+
+    async function refreshTrainerSelectOptions() {
+      _trainers = await fetchAllTrainersResolved();
+      const sel = document.getElementById('s-trainerid');
+      if (!sel) return;
+      sel.innerHTML = '<option value="">Select trainer…</option>' +
+        _trainers.map(t => `<option value="${t.id}">${escapeHtml(displayUserName(t))}</option>`).join('');
+    }
+
+    async function openAddScheduleModal() {
+      if (!isAdmin() && !isTrainer()) { toast('Requires Trainer or Admin role', 'error'); return; }
+      
+      if (isTrainer()) {
+        // For trainers, pre-select themselves and disable trainer selection
+        const sel = document.getElementById('s-trainerid');
+        if (sel) {
+          sel.innerHTML = `<option value="${_currentUser.id}">${escapeHtml(displayUserName(_currentUser))}</option>`;
+          sel.disabled = true;
+        }
+      } else {
+        // For admins, show all trainers
+        await refreshTrainerSelectOptions();
+        const sel = document.getElementById('s-trainerid');
+        if (!sel || sel.options.length <= 1) {
+          toast('No trainers available. Add a trainer first on the Trainers tab.', 'error'); return;
+        }
+      }
+      
+      openModal('modal-add-schedule');
+    }
+
+    async function submitAddSchedule() {
+      const gymClassId = parseInt(document.getElementById('s-classid').value, 10);
+      const userId = parseInt(document.getElementById('s-trainerid').value, 10);
+      const startVal = document.getElementById('s-starttime').value;
+      const duration = parseInt(document.getElementById('s-duration').value, 10) || 60;
+      if (!gymClassId) { toast('Please select a class', 'error'); return; }
+      if (!userId) { toast('Please select a trainer', 'error'); return; }
+      if (!startVal) { toast('Start time is required', 'error'); return; }
+      
+      // Check for duplicate schedule
+      const newStartTime = new Date(startVal);
+      const duplicateSchedule = _schedules.find(s => {
+        const existingStartTime = new Date(s.startTime);
+        const sameTrainer = s.trainerId === userId;
+        const sameTime = existingStartTime.getTime() === newStartTime.getTime();
+        return sameTrainer && sameTime;
+      });
+      
+      if (duplicateSchedule) {
+        const existingClass = _classes.find(c => c.id === duplicateSchedule.gymClassId)?.name || 'Unknown Class';
+        toast(`Schedule conflict: Trainer already has "${existingClass}" at this time!`, 'error');
+        return;
+      }
+      
+      try {
+        await api('/api/Trainer/AssignSchedule', 'POST', { userId, gymClassId, scheduledDateTime: new Date(startVal).toISOString(), duration });
+        toast('Schedule created!', 'success');
+        closeModal('modal-add-schedule');
+        
+        // Refresh both calendar and dashboard to show the new schedule
+        await loadSchedules();
+        await loadDashboard();
+      } catch (e) { 
+        toast('Error: ' + e.message, 'error'); 
+      }
+    }
+
+    function openEditScheduleModal(scheduleId) {
+      if (!isAdmin() && !isTrainer()) { toast('Requires Trainer or Admin role', 'error'); return; }
+      
+      const schedule = _schedules.find(s => s.id === scheduleId);
+      if (!schedule) { toast('Schedule not found', 'error'); return; }
+      
+      // Populate form fields
+      document.getElementById('es-id').value = schedule.id;
+      
+      // Format startTime for datetime-local input (YYYY-MM-DDTHH:mm) - preserve exact original time
+      const scheduleDate = new Date(schedule.startTime);
+      const year = scheduleDate.getFullYear();
+      const month = String(scheduleDate.getMonth() + 1).padStart(2, '0');
+      const day = String(scheduleDate.getDate()).padStart(2, '0');
+      const hours = String(scheduleDate.getHours()).padStart(2, '0');
+      const minutes = String(scheduleDate.getMinutes()).padStart(2, '0');
+      const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+      
+      document.getElementById('es-starttime').value = formattedDateTime;
+      document.getElementById('es-duration').value = schedule.durationMinutes || schedule.duration || 60;
+      
+      // Populate Gym Class dropdown
+      const classSel = document.getElementById('es-classid');
+      if (classSel) {
+        classSel.innerHTML = '<option value="">Select class...</option>' + 
+          _classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+        classSel.value = schedule.gymClassId;
+      }
+      
+      // Populate trainer select
+      if (isTrainer()) {
+        // Trainers can only select themselves
+        const trainerSel = document.getElementById('es-trainerid');
+        if (trainerSel) {
+          trainerSel.innerHTML = `<option value="${_currentUser.id}">${escapeHtml(displayUserName(_currentUser))}</option>`;
+          trainerSel.disabled = true;
+        }
+      } else {
+        // Admins can select any trainer
+        const trainerSel = document.getElementById('es-trainerid');
+        if (trainerSel) {
+          trainerSel.innerHTML = '<option value="">Select trainer…</option>' +
+            _trainers.map(t => `<option value="${t.id}">${escapeHtml(displayUserName(t))}</option>`).join('');
+          trainerSel.value = schedule.trainerId;
+        }
+      }
+      
+      openModal('modal-edit-schedule');
+    }
+
+    async function submitEditSchedule() {
+      const id = parseInt(document.getElementById('es-id').value, 10);
+      const gymClassId = parseInt(document.getElementById('es-classid').value, 10);
+      const userId = parseInt(document.getElementById('es-trainerid').value, 10);
+      const startVal = document.getElementById('es-starttime').value;
+      const duration = parseInt(document.getElementById('es-duration').value, 10) || 60;
+      
+      if (!gymClassId) { toast('Please select a class', 'error'); return; }
+      if (!userId) { toast('Please select a trainer', 'error'); return; }
+      if (!startVal) { toast('Start time is required', 'error'); return; }
+      
+      // Check for duplicate schedule (excluding current schedule being edited)
+      const newStartTime = new Date(startVal);
+      const duplicateSchedule = _schedules.find(s => {
+        if (s.id === id) return false; // Skip the current schedule being edited
+        const existingStartTime = new Date(s.startTime);
+        const sameTrainer = s.trainerId === userId;
+        const sameTime = existingStartTime.getTime() === newStartTime.getTime();
+        return sameTrainer && sameTime;
+      });
+      
+      if (duplicateSchedule) {
+        const existingClass = _classes.find(c => c.id === duplicateSchedule.gymClassId)?.name || 'Unknown Class';
+        toast(`Schedule conflict: Trainer already has "${existingClass}" at this time!`, 'error');
+        return;
+      }
+      
+      try {
+        await api('/api/Trainer/UpdateSchedule', 'PUT', { id, userId, gymClassId, scheduledDateTime: new Date(startVal).toISOString(), duration });
+        toast('Schedule updated!', 'success');
+        closeModal('modal-edit-schedule');
+        
+        // Refresh both calendar and dashboard
+        await loadSchedules();
+        await loadDashboard();
+      } catch (e) { 
+        toast('Error: ' + e.message, 'error'); 
+      }
+    }
+
+    function deleteSchedule(scheduleId) {
+      if (!isAdmin()) { toast('Only Admin can delete schedules', 'error'); return; }
+      
+      confirmDialog('Delete Schedule?', 'This will permanently remove the schedule.', async () => {
+        try {
+          await api('/api/Trainer/DeleteSchedule/' + scheduleId, 'DELETE');
+          toast('Schedule deleted', 'success');
+          
+          // Refresh both calendar and dashboard
+          await loadSchedules();
+          await loadDashboard();
+        } catch (e) { 
+          toast('Error: ' + e.message, 'error'); 
+        }
+      });
+    }
+
+    // ─── TRAINERS ─────────────────────────────────────────────────────────────────
+    async function loadTrainers() {
+      const tbody = document.getElementById('trainers-table');
+      tbody.innerHTML = `<tr class="loading-row"><td colspan="3"><div class="spinner"></div></td></tr>`;
+      try {
+        _trainers = await fetchAllTrainersResolved();
+        if (!_trainers.length) {
+          tbody.innerHTML = `<tr><td colspan="3"><div class="empty-state"><div class="emoji">🏃</div><h3>No trainers yet</h3><p>Add your first trainer</p></div></td></tr>`;
+          return;
+        }
+        tbody.innerHTML = _trainers.map((t, i) => {
+          const name = [t.firstName, t.lastName].filter(Boolean).join(' ') || t.username || '—';
+          const actions = isAdmin()
+            ? `<button class="btn btn-outline btn-sm" onclick='openEditTrainer(${JSON.stringify(t)})'>Edit</button>
+           <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteTrainer(${t.id})">Remove</button>`
+            : `<span style="color:var(--text-light);font-size:12px">View only</span>`;
+          return `<tr style="animation-delay:${i * 30}ms">
+        <td><div class="user-cell"><div class="avatar" style="background:#EFF6FF;color:#1E40AF">${initials(name)}</div>
+          <div><div class="user-name">${escapeHtml(name)}</div><div class="user-email">${escapeHtml(t.email || t.username || '')}</div></div>
+        </div></td>
+        <td style="color:var(--text-light);font-size:12px">ID: ${t.id}</td>
+        <td>${actions}</td>
+      </tr>`;
+        }).join('');
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--danger);padding:30px">Error: ${escapeHtml(e.message)}</td></tr>`;
+        toast('Failed to load trainers', 'error');
+      }
+    }
+
+    function openEditTrainer(t) {
+      document.getElementById('et-id').value = t.id;
+      document.getElementById('et-firstname').value = t.firstName || '';
+      document.getElementById('et-lastname').value = t.lastName || '';
+      document.getElementById('et-username').value = t.username || '';
+      document.getElementById('et-email').value = t.email || '';
+      openModal('modal-edit-trainer');
+    }
+
+    async function submitEditTrainer() {
+      if (!requireRole(ROLE_ADMIN)) return;
+      const id = document.getElementById('et-id').value;
+      const body = {
+        firstName: document.getElementById('et-firstname').value.trim() || null,
+        lastName: document.getElementById('et-lastname').value.trim() || null,
+        username: document.getElementById('et-username').value.trim() || null,
+        email: document.getElementById('et-email').value.trim() || null,
+      };
+      try {
+        await api('/api/Admin/UpdateTrainer/' + id, 'PUT', body);
+        toast('Trainer updated!', 'success');
+        closeModal('modal-edit-trainer');
+        loadTrainers();
+      } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    async function submitAddTrainer() {
+      if (!requireRole(ROLE_ADMIN)) return;
+      const body = {
+        firstName: document.getElementById('t-firstname').value.trim(),
+        lastName: document.getElementById('t-lastname').value.trim(),
+        username: document.getElementById('t-username').value.trim(),
+        password: document.getElementById('t-password').value,
+        email: document.getElementById('t-email').value.trim(),
+        phone: '', address: '',
+      };
+      if (!body.username || !body.password) { toast('Username and password are required', 'error'); return; }
+      if (!body.email) { toast('Email is required', 'error'); return; }
+      if (!body.firstName || !body.lastName) { toast('First and last name are required', 'error'); return; }
+      try {
+        const created = await api('/api/Admin/AddUser', 'POST', body);
+        const newId = created && (created.userId ?? created.id);
+        if (newId != null) { rememberUserId(newId); rememberTrainerId(newId); }
+        // Attempt to assign Trainer role automatically
+        if (newId != null) {
+          try {
+            const trainerRole = _roles.find(r => normalizeRoleName(r.name) === ROLE_TRAINER);
+            if (trainerRole) await api('/api/Admin/AssignRole', 'POST', { userId: newId, roleId: trainerRole.id });
+          } catch { }
+        }
+        toast('Trainer added! Remember to assign Trainer role via the Roles page.', 'success');
+        closeModal('modal-add-trainer');
+        loadTrainers();
+      } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    function deleteTrainer(id) {
+      if (!requireRole(ROLE_ADMIN)) return;
+      confirmDialog('Remove Trainer?', 'This trainer will be removed from the system.', async () => {
+        try {
+          await api('/api/Admin/DeleteTrainer/' + id, 'DELETE');
+          forgetUserId(id); forgetTrainerId(id);
+          toast('Trainer removed', 'success');
+          loadTrainers();
+        } catch (e) { toast('Error: ' + e.message, 'error'); }
+      });
+    }
+
+    // ─── ROLES ────────────────────────────────────────────────────────────────────
+    async function loadRoles() {
+      const tbody = document.getElementById('roles-table');
+      tbody.innerHTML = `<tr class="loading-row"><td colspan="3"><div class="spinner"></div></td></tr>`;
+      try {
+        const raw = await api('/api/Role/GetAllRoles') || [];
+        _roles = raw.map(normalizeRole);
+
+        if (!_roles.length) {
+          tbody.innerHTML = `<tr><td colspan="3"><div class="empty-state"><div class="emoji">⭐</div><h3>No roles</h3><p>Create your first role</p></div></td></tr>`;
+        } else {
+          tbody.innerHTML = _roles.map((r, i) => `<tr style="animation-delay:${i * 30}ms">
+        <td style="color:var(--text-light);font-size:12px">#${r.id}</td>
+        <td><strong>${escapeHtml(r.name || r.roleName || '—')}</strong></td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteRole(${r.id})">Delete</button></td>
+      </tr>`).join('');
+        }
+
+        // Populate assign role selects
+        const userSel = document.getElementById('assign-userid');
+        const roleSel = document.getElementById('assign-roleid');
+        const all = await fetchAllUsersResolved();
+        await setFullUserCaches(all);
+        userSel.innerHTML = '<option value="">Select user...</option>' +
+          _allUsersResolved.map(u => `<option value="${u.id}">${escapeHtml(displayUserName(u))} (ID:${u.id})</option>`).join('');
+        roleSel.innerHTML = '<option value="">Select role...</option>' +
+          _roles.map(r => `<option value="${r.id}">${escapeHtml(r.name || r.roleName)}</option>`).join('');
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--danger);padding:30px">Error: ${escapeHtml(e.message)}</td></tr>`;
+        toast('Failed to load roles', 'error');
+      }
+    }
+
+    async function submitAddRole() {
+      const roleName = document.getElementById('r-name').value.trim();
+      if (!roleName) { toast('Role name is required', 'error'); return; }
+      try {
+        await api('/api/Role/CreateRole', 'POST', { roleName });
+        toast('Role created!', 'success');
+        closeModal('modal-add-role');
+        loadRoles();
+      } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    function deleteRole(id) {
+      if (!requireRole(ROLE_ADMIN)) return;
+      confirmDialog('Delete Role?', 'Users with this role may be affected.', async () => {
+        try {
+          await api('/api/Role/DeleteRole/' + id, 'DELETE');
+          toast('Role deleted', 'success');
+          loadRoles();
+        } catch (e) { toast('Error: ' + e.message, 'error'); }
+      });
+    }
+
+    async function submitAssignRole() {
+      if (!requireRole(ROLE_ADMIN)) return;
+      const userId = parseInt(document.getElementById('assign-userid').value, 10);
+      const roleId = parseInt(document.getElementById('assign-roleid').value, 10);
+      if (!userId) { toast('Please select a user', 'error'); return; }
+      if (!roleId) { toast('Please select a role', 'error'); return; }
+      try {
+        await api('/api/Admin/AssignRole', 'POST', { userId, roleId });
+        const role = _roles.find(r => r.id === roleId);
+        toast(`Role "${role?.name || roleId}" assigned to user #${userId}`, 'success');
+        // If assigning Trainer role, remember that user as trainer
+        if (role && normalizeRoleName(role.name) === ROLE_TRAINER) rememberTrainerId(userId);
+        loadRoles();
+      } catch (e) { toast('Error: ' + e.message, 'error'); }
+    }
+
+    // ─── INIT ─────────────────────────────────────────────────────────────────────
+    (async function init() {
+      if (restoreSession()) {
+        // If firstName/lastName are missing from saved session, fetch full profile
+        if (!_currentUser.firstName && !_currentUser.lastName && _currentUser.id) {
+          try {
+            const fullProfile = await apiAuth('/api/User/GetProfile/' + _currentUser.id).catch(() => null);
+            if (fullProfile && (fullProfile.firstName || fullProfile.lastName)) {
+              _currentUser = { ..._currentUser, ...normalizeUser(fullProfile) };
+              saveSession();
+            }
+          } catch (e) { /* silently ignore */ }
+        }
+        hideAuthScreen();
+        applyRbacUI();
+        const firstNav = document.querySelector('.nav-item');
+        navigate('dashboard', firstNav);
+        toast(`Welcome back, ${_currentUser.firstName || _currentUser.username || 'User'}!`, 'success');
+      } else {
+        showAuthScreen();
+      }
+    })();
+  </script>
+</body>
+
+</html>
